@@ -16,13 +16,49 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 */
-#include <iostream>
 #include "basic_chess.h"
 
-using namespace ccm;
+namespace ccm {
+    int **BasicChess::get_chessboard() const {
+        return chessboard;
+    }
 
-int main() {
-    BasicChess bc(7);
-    bc.PrintBoard();
-    return 0;
+    int BasicChess::get_width() const {
+        return width;
+    }
+
+    void BasicChess::PrintBoard() const {
+        for (int i = 0; i < width; ++i) {
+            for (int j = 0; j < width; ++j) {
+                FormatPrint(chessboard[i][j]);
+            }
+            std::cout << std::endl;
+        }
+    }
+
+    void BasicChess::FormatPrint(int type) {
+        switch (type) {
+            case 0:
+                std::cout << "╋";
+                break;
+            case 1:
+                std::cout << "┏";
+                break;
+            case 2:
+                std::cout << "┓";
+                break;
+            default:
+                std::cout << "0";
+        }
+    }
+
+    BasicChess::BasicChess(int width) : width(width) {
+        chessboard = new int *[width];
+        for (int i = 0; i < width; ++i) {
+            chessboard[i] = new int[width];
+            for (int j = 0; j < width; ++j) {
+                chessboard[i][j] = 0;
+            }
+        }
+    }
 }

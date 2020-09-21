@@ -16,13 +16,29 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 */
+#ifndef FIVECHESSWITHAI_BASIC_CHESS_H
+#define FIVECHESSWITHAI_BASIC_CHESS_H
+
 #include <iostream>
-#include "basic_chess.h"
 
-using namespace ccm;
+namespace ccm {
 
-int main() {
-    BasicChess bc(7);
-    bc.PrintBoard();
-    return 0;
+    class BasicChess {
+    public:
+        int get_width() const;
+
+        int **get_chessboard() const;
+
+        void PrintBoard() const;
+
+        static void FormatPrint(int type) ;
+
+        BasicChess(int width);
+
+    private:
+        int width;
+        int **chessboard;
+    };
 }
+
+#endif //FIVECHESSWITHAI_BASIC_CHESS_H
