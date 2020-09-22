@@ -16,13 +16,4 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 */
-#include <iostream>
-#include "basic_chess.h"
-
-using namespace ccm;
-
-int main() {
-    BasicChess bc(15);
-    bc.PrintBoard();
-    return 0;
-}
+#include "player.h"

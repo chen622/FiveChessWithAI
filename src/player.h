@@ -16,13 +16,13 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 */
-#include <iostream>
-#include "basic_chess.h"
+#ifndef SRC_PLAYER_H_
+#define SRC_PLAYER_H_
 
-using namespace ccm;
+namespace ccm {
+class Player {
 
-int main() {
-    BasicChess bc(15);
-    bc.PrintBoard();
-    return 0;
-}
+};
+} // namespace ccm
+
+#endif //SRC_PLAYER_H_

@@ -16,29 +16,30 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 */
-#ifndef FIVECHESSWITHAI_BASIC_CHESS_H
-#define FIVECHESSWITHAI_BASIC_CHESS_H
+#ifndef SRC_BASIC_CHESS_H_
+#define SRC_BASIC_CHESS_H_
 
 #include <iostream>
+#include <string>
 
 namespace ccm {
 
-    class BasicChess {
-    public:
-        int get_width() const;
+class BasicChess {
+ public:
+  int get_width() const;
 
-        int **get_chessboard() const;
+  int **get_chessboard() const;
 
-        void PrintBoard() const;
+  void PrintBoard() const;
 
-        static void FormatPrint(int type) ;
+  void FormatPrint(int type, u_int8_t row, u_int8_t column) const;
 
-        BasicChess(int width);
+  explicit BasicChess(int width);
 
-    private:
-        int width;
-        int **chessboard;
-    };
-}
+ private:
+  int width;
+  int **chessboard;
+};
+}  // namespace ccm
 
-#endif //FIVECHESSWITHAI_BASIC_CHESS_H
+#endif  // SRC_BASIC_CHESS_H_
