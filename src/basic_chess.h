@@ -21,24 +21,24 @@
 
 #include <iostream>
 #include <string>
+#include <cstdint>
 
 namespace ccm {
 
 class BasicChess {
  public:
-  int get_width() const;
-
-  int **get_chessboard() const;
+  uint8_t GetWidth() const;
+  uint8_t **GetChessboard() const;
 
   void PrintBoard() const;
 
-  void FormatPrint(int type, u_int8_t row, u_int8_t column) const;
+  void FormatPrint(uint8_t type, uint8_t row, uint8_t column) const;
 
-  explicit BasicChess(int width);
+  explicit BasicChess(uint8_t width);
 
  private:
-  int width;
-  int **chessboard;
+  uint8_t width;
+  uint8_t **chessboard;
 };
 }  // namespace ccm
 

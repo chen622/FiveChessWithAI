@@ -19,10 +19,24 @@
 #ifndef SRC_PLAYER_H_
 #define SRC_PLAYER_H_
 
+#include <cstdint>
+
 namespace ccm {
 class Player {
-
+ private:
+  uint8_t score;  // 分数
+  bool is_computer;  // 是否为电脑
+  bool is_first;  // 是否为先手
+ public:
+  uint8_t GetScore() const;
+  void SetScore(uint8_t score);
+  bool IsComputer() const;
+  void SetIsComputer(bool is_computer);
+  bool IsFirst() const;
+  void SetIsFirst(bool is_first);
+  Player(bool is_first);
+  Player(bool is_computer, bool is_first, uint8_t score);
 };
-} // namespace ccm
+}  // namespace ccm
 
-#endif //SRC_PLAYER_H_
+#endif  // SRC_PLAYER_H_

@@ -19,30 +19,23 @@
 #include "src/basic_chess.h"
 
 namespace ccm {
-int **BasicChess::get_chessboard() const {
-  return chessboard;
-}
-
-int BasicChess::get_width() const {
-  return width;
-}
 
 void BasicChess::PrintBoard() const {
-  for (u_int8_t i = 0; i < width; ++i) {
-    for (u_int8_t j = 0; j < width; ++j) {
+  for (uint8_t i = 0; i < width; ++i) {
+    for (uint8_t j = 0; j < width; ++j) {
       FormatPrint(chessboard[i][j], i, j);
     }
     std::cout << std::endl;
   }
   std::cout << "\t     ";
-  for (u_int8_t i = 0; i < width; ++i) {
+  for (uint8_t i = 0; i < width; ++i) {
     std::cout << char(i + 65) << " ";
   }
   std::cout << std::endl;
 }
 
-void BasicChess::FormatPrint(int type, u_int8_t row, u_int8_t column) const {
-  u_int8_t row_number = (width - row - 1);
+void BasicChess::FormatPrint(uint8_t type, uint8_t row, uint8_t column) const {
+  uint8_t row_number = (width - row - 1);
   std::string row_mark = (row_number < 10) ?
                          "0" + std::to_string(row_number) : std::to_string(row_number);
   switch (type) {
@@ -76,11 +69,11 @@ void BasicChess::FormatPrint(int type, u_int8_t row, u_int8_t column) const {
   }
 }
 
-BasicChess::BasicChess(int width) : width(width) {
-  chessboard = new int *[width];
-  for (int i = 0; i < width; ++i) {
-    chessboard[i] = new int[width];
-    for (int j = 0; j < width; ++j) {
+BasicChess::BasicChess(uint8_t width) : width(width) {
+  chessboard = new uint8_t *[width];
+  for (uint8_t i = 0; i < width; ++i) {
+    chessboard[i] = new uint8_t[width];
+    for (uint8_t j = 0; j < width; ++j) {
       if (i == 0) {
         if (j == 0)
           chessboard[i][j] = 1;
@@ -104,5 +97,11 @@ BasicChess::BasicChess(int width) : width(width) {
       }
     }
   }
+}
+uint8_t BasicChess::GetWidth() const {
+  return width;
+}
+uint8_t **BasicChess::GetChessboard() const {
+  return chessboard;
 }
 }  // namespace ccm

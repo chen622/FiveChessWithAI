@@ -16,29 +16,17 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 */
-#include "src/player.h"
-
+#include "src/chess_game.h"
 namespace ccm {
+ChessGame::ChessGame(bool has_computer, bool computer_first, uint8_t total_count)
+    : board(15), total_count(total_count), player1(true), player2(false) {
+  if (has_computer) {
+    if (computer_first) {
+      player1.SetIsComputer(true);
+    } else {
+      player2.SetIsComputer(true);
+    }
+  }
+}
 
-uint8_t Player::GetScore() const {
-  return score;
-}
-void Player::SetScore(uint8_t _score) {
-  Player::score = _score;
-}
-bool Player::IsComputer() const {
-  return is_computer;
-}
-void Player::SetIsComputer(bool _is_computer) {
-  Player::is_computer = _is_computer;
-}
-bool Player::IsFirst() const {
-  return is_first;
-}
-void Player::SetIsFirst(bool _is_first) {
-  Player::is_first = _is_first;
-}
-Player::Player(bool is_first) : score(0), is_computer(is_first), is_first(false) {}
-Player::Player(bool is_computer, bool is_first, uint8_t score)
-    : score(score), is_computer(is_computer), is_first(is_first) {}
 }  // namespace ccm
