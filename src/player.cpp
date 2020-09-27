@@ -23,7 +23,7 @@
 
 namespace ccm {
 
-Player::Player(bool is_first) : score(0), is_computer(is_first), is_first(false) {}
+Player::Player(bool is_first) : score(0), is_computer(false), is_first(is_first) {}
 Player::Player(bool is_computer, bool is_first, uint8_t score)
     : score(score), is_computer(is_computer), is_first(is_first) {}
 
@@ -46,20 +46,25 @@ void Player::SetIsFirst(bool _is_first) {
   Player::is_first = _is_first;
 }
 
-int Player::Compare(const Player &other_player){
+int Player::Compare(const Player &other_player) {
   return this->score - other_player.GetScore();
 }
 
-pair<uint8_t, uint8_t> Player::NextStep() {
-  uint8_t row;
-  string col_str;
+
+pair<uint8_t, uint8_t> Player::NextStep(int width) {
+  uint row, col;
+  unsigned char col_str;
   do {
     cin.clear();
+    cin.sync();
     cout << "轮到 Player" << (is_first ? "1" : "2") << " 落子：";
     cin >> row >> col_str;
     if (cin.fail()) cout << "输入值异常，请重新输入！" << endl;
-  } while (cin.fail());
-  cout << row << " " << col_str << endl;
-  return pair<uint8_t, uint8_t>();
+    else {
+//      cout << row << " " << col_str << endl;
+      col = col_str - 'A';
+    }
+  } while (cin.fail() || row > width || col > width);
+  return {row, col};
 }
 }  // namespace ccm

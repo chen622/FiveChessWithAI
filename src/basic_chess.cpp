@@ -23,53 +23,76 @@
 
 namespace ccm {
 
-BasicChess::BasicChess(uint8_t width) : width(width) {
-  chessboard = new int *[width];
+BasicChess::BasicChess(uint8_t width) : width(width), step_count(0) {
+  chessboard = new BoardIndex *[width];
   for (uint8_t i = 0; i < width; ++i) {
-    chessboard[i] = new int[width];
+    chessboard[i] = new BoardIndex[width];
     for (uint8_t j = 0; j < width; ++j) {
       if (i == 0) {
         if (j == 0)
-          chessboard[i][j] = 1;
+          chessboard[i][j] = BoardIndex::LEFT_TOP;
         else if (j == width - 1)
-          chessboard[i][j] = 2;
+          chessboard[i][j] = BoardIndex::RIGHT_TOP;
         else
-          chessboard[i][j] = 11;
+          chessboard[i][j] = BoardIndex::TOP;
       } else if (i == width - 1) {
         if (j == 0)
-          chessboard[i][j] = 4;
+          chessboard[i][j] = BoardIndex::LEFT_BOTTOM;
         else if (j == width - 1)
-          chessboard[i][j] = 3;
+          chessboard[i][j] = BoardIndex::RIGHT_BOTTOM;
         else
-          chessboard[i][j] = 13;
+          chessboard[i][j] = BoardIndex::BOTTOM;
       } else if (j == 0) {
-        chessboard[i][j] = 14;
+        chessboard[i][j] = BoardIndex::LEFT;
       } else if (j == width - 1) {
-        chessboard[i][j] = 12;
+        chessboard[i][j] = BoardIndex::RIGHT;
       } else {
-        chessboard[i][j] = 0;
+        chessboard[i][j] = BoardIndex::CENTER;
       }
     }
   }
 }
 
+BasicChess::BasicChess(const BasicChess &other_chess)
+    : width(other_chess.GetWidth()), step_count(other_chess.GetStepCount()) {
+  for (const auto &other_step : other_chess.GetFullStep()) {
+    full_step.push_back(other_step);
+  }
+
+  chessboard = new BoardIndex *[width];
+
+  const auto &board = other_chess.GetChessboard();
+  for (uint8_t i = 0; i < width; ++i) {
+    chessboard[i] = new BoardIndex[width];
+    for (int j = 0; j < width; ++j) {
+      this->chessboard[i][j] = board[i][j];
+    }
+  }
+}
 uint8_t BasicChess::GetWidth() const {
   return width;
 }
-int **BasicChess::GetChessboard() const {
+BoardIndex **BasicChess::GetChessboard() const {
   return chessboard;
 }
-uint32_t BasicChess::GetCount() const {
-  return count;
+uint32_t BasicChess::GetStepCount() const {
+  return step_count;
 }
-uint32_t BasicChess::AddAfterGet() {
-  return count++;
+
+const std::vector<std::pair<uint8_t, uint8_t>> &BasicChess::GetFullStep() const {
+  return full_step;
 }
 
 void BasicChess::PrintBoard() const {
+  const auto &last = this->full_step.empty() ? std::pair<uint8_t, uint8_t>(-1, -1) : this->full_step.back();
+  system("clear");
   for (uint8_t i = 0; i < width; ++i) {
     for (uint8_t j = 0; j < width; ++j) {
-      FormatPrint(chessboard[i][j], i, j);
+      if (i == last.first && j == last.second) {
+        FormatPrint(BoardIndex(1 + static_cast<int>(chessboard[i][j])), i, j);
+      } else {
+        FormatPrint(chessboard[i][j], i, j);
+      }
     }
     std::cout << std::endl;
   }
@@ -79,47 +102,97 @@ void BasicChess::PrintBoard() const {
   }
   std::cout << std::endl;
 }
-
-void BasicChess::FormatPrint(uint8_t type, uint8_t row, uint8_t column) const {
-  uint8_t row_number = (width - row - 1);
-  std::string row_mark = (row_number < 10) ?
-                         "0" + std::to_string(row_number) : std::to_string(row_number);
+void BasicChess::FormatPrint(BoardIndex type, uint8_t row, uint8_t column) const {
+  if (column == 0) {
+    uint8_t row_number = (width - row);
+    std::cout << "\t" << ((row_number < 10) ?
+                          "0" + std::to_string(row_number) : std::to_string(row_number));
+  }
   switch (type) {
-    case 0:std::cout << "╋";
+    case BoardIndex::CENTER:std::cout << "╋";
       break;
-    case 1:std::cout << "\t" << row_mark << "┏";
+    case BoardIndex::LEFT_TOP:std::cout << "┏";
       break;
-    case 2:std::cout << "┓";
+    case BoardIndex::RIGHT_TOP:std::cout << "┓";
       break;
-    case 3:std::cout << "┛";
+    case BoardIndex::RIGHT_BOTTOM:std::cout << "┛";
       break;
-    case 4:std::cout << "\t" << row_mark << "┗";
+    case BoardIndex::LEFT_BOTTOM:std::cout << "┗";
       break;
-    case 11:std::cout << "┳";
+    case BoardIndex::TOP:std::cout << "┳";
       break;
-    case 12:std::cout << "┫";
+    case BoardIndex::RIGHT:std::cout << "┫";
       break;
-    case 13:std::cout << "┻";
+    case BoardIndex::BOTTOM:std::cout << "┻";
       break;
-    case 14:std::cout << "\t" << row_mark << "┣";
+    case BoardIndex::LEFT:std::cout << "┣";
       break;
-    case BLACK_CHESS_INDEX:std::cout << "●";
+    case BoardIndex::BLACK_CHESS:std::cout << "●";
       break;
-    case BLACK_CHESS_INDEX + 1:std::cout << "▲";
+    case BoardIndex::LAST_BLACK :std::cout << "▲";
       break;
-    case WHITE_CHESS_INDEX:std::cout << "○";
+    case BoardIndex::WHITE_CHESS:std::cout << "○";
       break;
-    case WHITE_CHESS_INDEX + 1:std::cout << "△";
+    case BoardIndex::LAST_WHITE:std::cout << "△";
       break;
     default:std::cout << "0";
   }
 }
 
-int BasicChess::NextStep(std::pair<uint8_t,uint8_t> position) {
-  return 0;
+int BasicChess::NextStep(std::pair<uint8_t, uint8_t> position) {
+  position.first = width - position.first;
+  chessboard[position.first][position.second] =
+      this->step_count % 2 == 0 ? BoardIndex::BLACK_CHESS : BoardIndex::WHITE_CHESS;
+  this->step_count++;
+  this->full_step.push_back(position);
+  this->PrintBoard();
+  return HasWin();
 }
-int BasicChess::WhoWinMatch() {
-  return 0;
+
+int BasicChess::HasWin() {
+  if (this->step_count < 9) {  // no enough chess to win
+    return false;
+  }
+  BoardIndex compare_val;
+  if (this->step_count % 2 == 0) {  // second
+    compare_val = BoardIndex::WHITE_CHESS;
+  } else {  // first
+    compare_val = BoardIndex::BLACK_CHESS;
+  }
+  const auto &last_step = this->full_step.back();
+  int count = 1;
+
+  // horizontal
+  if (this->Traverse(last_step, compare_val, 0, 1)) return 1;
+
+  // vertical
+  if (this->Traverse(last_step, compare_val, 1, 0)) return 2;
+
+  // left bottom to right top
+  if (this->Traverse(last_step, compare_val, 1, 1)) return 3;
+
+  // right bottom to left top
+  if (this->Traverse(last_step, compare_val, 1, -1)) return 4;
+
+  return false;
+}
+bool BasicChess::Traverse(std::pair<uint8_t, uint8_t> last_step, BoardIndex compare_val, int x_para, int y_para) {
+  int count = 1;
+  for (uint8_t i = 1;; i++) {
+    uint8_t x = last_step.first + (i * x_para), y = last_step.second + (i * y_para);
+    if (x >= width || y >= width) break;
+    if (chessboard[x][y] != compare_val) break;
+    count++;
+  }
+
+  for (uint8_t i = 1; true; i++) {
+    uint8_t x = last_step.first - (i * x_para), y = last_step.second - (i * y_para);
+    if (x < 0 || y < 0) break;
+    if (chessboard[x][y] != compare_val) break;
+    count++;
+  }
+  if (count >= 5) return true;
+  return false;
 }
 
 }  // namespace ccm

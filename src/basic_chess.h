@@ -22,36 +22,56 @@
 #ifndef SRC_BASIC_CHESS_H_
 #define SRC_BASIC_CHESS_H_
 
-// The index value which represent the black chess.
-#define BLACK_CHESS_INDEX 50
-// The index value which represent the white chess.
-#define WHITE_CHESS_INDEX 52
 #include <iostream>
 #include <string>
 #include <cstdint>
 #include <utility>
+#include <vector>
 
 namespace ccm {
+
+// The enum class to record the index of each board type.
+enum class BoardIndex{
+  CENTER = 0,
+  LEFT_TOP = 1,
+  RIGHT_TOP = 2,
+  RIGHT_BOTTOM = 3,
+  LEFT_BOTTOM = 4,
+  TOP = 11,
+  RIGHT = 12,
+  BOTTOM = 13,
+  LEFT = 14,
+  BLACK_CHESS = 20,
+  LAST_BLACK = 21,
+  WHITE_CHESS = 30,
+  LAST_WHITE = 31
+};
 
 class BasicChess {
  private:
   uint8_t width;
-  int **chessboard;
+  BoardIndex **chessboard;
   // The step has already happened
-  uint32_t count;
-  void FormatPrint(uint8_t type, uint8_t row, uint8_t column) const;
+  uint32_t step_count;
+  // The position of each step
+  std::vector<std::pair<uint8_t,uint8_t>> full_step;
+  // Print the position symbol by type index.
+  void FormatPrint(BoardIndex type, uint8_t row, uint8_t column) const;
   // Return positive if player1 win the match, 0 if no one has already win.
-  int WhoWinMatch();
+  int HasWin();
+  // A template function to traverse positions nearby the last step.
+  bool Traverse(std::pair<uint8_t, uint8_t> last_step, BoardIndex compare_val, int x_para, int y_para);
  public:
+  explicit BasicChess(uint8_t width);
+  BasicChess(const BasicChess &);
   uint8_t GetWidth() const;
-  int **GetChessboard() const;
-  uint32_t GetCount() const;
-  uint32_t AddAfterGet();
+  BoardIndex **GetChessboard() const;
+  uint32_t GetStepCount() const;
+  const std::vector<std::pair<uint8_t, uint8_t>> &GetFullStep() const;
 
   // Print the board in the console.
   void PrintBoard() const;
   int NextStep(std::pair<uint8_t,uint8_t> position);
-  explicit BasicChess(uint8_t width);
 };
 }  // namespace ccm
 

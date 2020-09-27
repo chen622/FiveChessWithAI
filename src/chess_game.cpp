@@ -36,7 +36,8 @@ ChessGame::ChessGame(bool has_computer, bool computer_first, uint8_t total_count
 
 int ChessGame::Playing() {
   while (WhoWinGame() == 0) {
-
+    int match_rst = this->PlayAMatch();
+    this->count++;
   }
   return 0;
 }
@@ -44,17 +45,20 @@ int ChessGame::Playing() {
 int ChessGame::PlayAMatch() {
   int who_win = 0;
   BasicChess board(BOARD_SIZE);
+  board.PrintBoard();
   while (who_win == 0) {
-    pair<uint8_t,uint8_t> position;
-    if (board.GetCount() % 2 == 0) {
-      position = player1.NextStep();
-
+    pair<uint8_t, uint8_t> position;
+    if ((board.GetStepCount()) % 2 == (this->count % 2)) {
+      position = player1.NextStep(BOARD_SIZE);
+      who_win = board.NextStep(position);
     } else {
-
+      position = player2.NextStep(BOARD_SIZE);
+      who_win = -board.NextStep(position);
     }
-    who_win = board.
   }
   boards.push_back(board);
+  std::cout << "一句比赛结束" << (who_win > 0 ? "玩家1获胜" : "玩家2获胜") << endl;
+  return who_win;
 }
 
 int ChessGame::WhoWinGame() {

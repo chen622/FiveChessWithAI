@@ -35,9 +35,9 @@ namespace ccm {
 //    int ret = game.Playing();
 class ChessGame {
  private:
-  // The count of matches already finished
+  // The step_count of matches already finished
   uint8_t count;
-  // The count of matches which need to finish
+  // The step_count of matches which need to finish
   uint8_t total_count;
   Player player1;
   Player player2;

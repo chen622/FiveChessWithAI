@@ -46,7 +46,7 @@ class Player {
 
   int Compare(const Player &);
 
-  std::pair<uint8_t,uint8_t> NextStep();
+  std::pair<uint8_t,uint8_t> NextStep(int);
 };
 }  // namespace ccm
 
