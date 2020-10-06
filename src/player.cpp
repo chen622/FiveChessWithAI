@@ -24,7 +24,7 @@
 namespace ccm {
 
 Player::Player(bool is_first) : score(0), is_computer(false), is_first(is_first) {}
-Player::Player(bool is_computer, bool is_first, uint8_t score)
+Player::Player(bool is_computer, bool is_first, uint16_t score)
     : score(score), is_computer(is_computer), is_first(is_first) {}
 
 int Player::GetScore() const {
@@ -50,21 +50,21 @@ int Player::Compare(const Player &other_player) {
   return this->score - other_player.GetScore();
 }
 
-
-pair<uint8_t, uint8_t> Player::NextStep(int width) {
+std::pair<uint16_t, uint16_t> Player::NextStep(int width) {
   uint row, col;
   unsigned char col_str;
   do {
-    cin.clear();
-    cin.sync();
-    cout << "轮到 Player" << (is_first ? "1" : "2") << " 落子：";
-    cin >> row >> col_str;
-    if (cin.fail()) cout << "输入值异常，请重新输入！" << endl;
+    std::cin.clear();
+    std::cin.sync();
+    std::cout << "轮到 Player" << (is_first ? "1" : "2") << " 落子：";
+    std::cin >> row >> col_str;
+    if (std::cin.fail()) std::cout << "输入值异常，请重新输入！" << std::endl;
     else {
-//      cout << row << " " << col_str << endl;
       col = col_str - 'A';
+      row--;
     }
-  } while (cin.fail() || row > width || col > width);
+    if (row >= width || col >= width) std::cout << "输入值超出范围，请重新输入！" << std::endl;
+  } while (std::cin.fail() || row >= width || col >= width);
   return {row, col};
 }
 }  // namespace ccm

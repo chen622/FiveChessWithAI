@@ -49,29 +49,32 @@ enum class BoardIndex{
 
 class BasicChess {
  private:
-  uint8_t width;
+  uint16_t width;
   BoardIndex **chessboard;
   // The step has already happened
   uint32_t step_count;
   // The position of each step
-  std::vector<std::pair<uint8_t,uint8_t>> full_step;
+  std::vector<std::pair<uint16_t,uint16_t>> full_step;
   // Print the position symbol by type index.
-  void FormatPrint(BoardIndex type, uint8_t row, uint8_t column) const;
+  void FormatPrint(BoardIndex type, uint16_t row, uint16_t column) const;
   // Return positive if player1 win the match, 0 if no one has already win.
   int HasWin();
   // A template function to traverse positions nearby the last step.
-  bool Traverse(std::pair<uint8_t, uint8_t> last_step, BoardIndex compare_val, int x_para, int y_para);
+  bool Traverse(std::pair<uint16_t, uint16_t> last_step, BoardIndex compare_val, int x_para, int y_para);
  public:
-  explicit BasicChess(uint8_t width);
+  explicit BasicChess(uint16_t width);
   BasicChess(const BasicChess &);
-  uint8_t GetWidth() const;
+  uint16_t GetWidth() const;
   BoardIndex **GetChessboard() const;
   uint32_t GetStepCount() const;
-  const std::vector<std::pair<uint8_t, uint8_t>> &GetFullStep() const;
+  const std::vector<std::pair<uint16_t, uint16_t>> &GetFullStep() const;
 
   // Print the board in the console.
   void PrintBoard() const;
-  int NextStep(std::pair<uint8_t,uint8_t> position);
+  // Set a piece into the board.
+  int NextStep(std::pair<uint16_t,uint16_t> position);
+  // Check the position has piece or not?
+  bool HasPieceOnPosition(std::pair<uint16_t,uint16_t> position);
 };
 }  // namespace ccm
 

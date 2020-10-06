@@ -36,13 +36,13 @@ namespace ccm {
 class ChessGame {
  private:
   // The step_count of matches already finished
-  uint8_t count;
+  uint16_t count;
   // The step_count of matches which need to finish
-  uint8_t total_count;
+  uint16_t total_count;
   Player player1;
   Player player2;
   // A vector to save all chess boards
-  vector<BasicChess> boards;
+  std::vector<BasicChess> boards;
   // Function to start a match.
   // Return positive if player1 win a match, 0 if no one win.
   int PlayAMatch();
@@ -50,7 +50,7 @@ class ChessGame {
   int WhoWinGame();
 
  public:
-  ChessGame(bool has_computer, bool computer_first, uint8_t total_count);
+  ChessGame(bool has_computer, bool computer_first, uint16_t total_count);
   int Playing();
 };
 }  // namespace ccm

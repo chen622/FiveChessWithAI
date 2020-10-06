@@ -21,7 +21,7 @@
 */
 #include "src/chess_game.h"
 namespace ccm {
-ChessGame::ChessGame(bool has_computer, bool computer_first, uint8_t total_count)
+ChessGame::ChessGame(bool has_computer, bool computer_first, uint16_t total_count)
     : total_count(total_count), player1(true), player2(false) {
   if (has_computer) {  // PVE
     if (computer_first) {
@@ -47,17 +47,31 @@ int ChessGame::PlayAMatch() {
   BasicChess board(BOARD_SIZE);
   board.PrintBoard();
   while (who_win == 0) {
-    pair<uint8_t, uint8_t> position;
+    std::pair<uint16_t, uint16_t> position;
     if ((board.GetStepCount()) % 2 == (this->count % 2)) {
-      position = player1.NextStep(BOARD_SIZE);
+      while (true) {
+        position = player1.NextStep(BOARD_SIZE);
+        if (board.HasPieceOnPosition(position)) {
+          std::cout << "落子位置已有棋子，请重新输入！" << std::endl;
+        } else {
+          break;
+        }
+      }
       who_win = board.NextStep(position);
     } else {
-      position = player2.NextStep(BOARD_SIZE);
+      while (true) {
+        position = player2.NextStep(BOARD_SIZE);
+        if (board.HasPieceOnPosition(position)) {
+          std::cout << "落子位置已有棋子，请重新输入！" << std::endl;
+        } else {
+          break;
+        }
+      }
       who_win = -board.NextStep(position);
     }
   }
   boards.push_back(board);
-  std::cout << "一句比赛结束" << (who_win > 0 ? "玩家1获胜" : "玩家2获胜") << endl;
+  std::cout << "一句比赛结束" << (who_win > 0 ? "玩家1获胜" : "玩家2获胜") << std::endl;
   return who_win;
 }
 

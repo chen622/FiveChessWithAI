@@ -23,19 +23,19 @@
 
 namespace ccm {
 
-BasicChess::BasicChess(uint8_t width) : width(width), step_count(0) {
+BasicChess::BasicChess(uint16_t width) : width(width), step_count(0) {
   chessboard = new BoardIndex *[width];
-  for (uint8_t i = 0; i < width; ++i) {
+  for (uint16_t i = 0; i < width; ++i) {
     chessboard[i] = new BoardIndex[width];
-    for (uint8_t j = 0; j < width; ++j) {
-      if (i == 0) {
+    for (uint16_t j = 0; j < width; ++j) {
+      if (i == width - 1) {
         if (j == 0)
           chessboard[i][j] = BoardIndex::LEFT_TOP;
         else if (j == width - 1)
           chessboard[i][j] = BoardIndex::RIGHT_TOP;
         else
           chessboard[i][j] = BoardIndex::TOP;
-      } else if (i == width - 1) {
+      } else if (i == 0) {
         if (j == 0)
           chessboard[i][j] = BoardIndex::LEFT_BOTTOM;
         else if (j == width - 1)
@@ -62,14 +62,14 @@ BasicChess::BasicChess(const BasicChess &other_chess)
   chessboard = new BoardIndex *[width];
 
   const auto &board = other_chess.GetChessboard();
-  for (uint8_t i = 0; i < width; ++i) {
+  for (uint16_t i = 0; i < width; ++i) {
     chessboard[i] = new BoardIndex[width];
     for (int j = 0; j < width; ++j) {
       this->chessboard[i][j] = board[i][j];
     }
   }
 }
-uint8_t BasicChess::GetWidth() const {
+uint16_t BasicChess::GetWidth() const {
   return width;
 }
 BoardIndex **BasicChess::GetChessboard() const {
@@ -79,15 +79,14 @@ uint32_t BasicChess::GetStepCount() const {
   return step_count;
 }
 
-const std::vector<std::pair<uint8_t, uint8_t>> &BasicChess::GetFullStep() const {
+const std::vector<std::pair<uint16_t, uint16_t>> &BasicChess::GetFullStep() const {
   return full_step;
 }
 
 void BasicChess::PrintBoard() const {
-  const auto &last = this->full_step.empty() ? std::pair<uint8_t, uint8_t>(-1, -1) : this->full_step.back();
-  system("clear");
-  for (uint8_t i = 0; i < width; ++i) {
-    for (uint8_t j = 0; j < width; ++j) {
+  const auto &last = this->full_step.empty() ? std::pair<uint16_t, uint16_t>(-1, -1) : this->full_step.back();
+  for (int16_t i = width -1 ; i >= 0; --i) {
+    for (int16_t j = 0; j < width; ++j) {
       if (i == last.first && j == last.second) {
         FormatPrint(BoardIndex(1 + static_cast<int>(chessboard[i][j])), i, j);
       } else {
@@ -97,14 +96,14 @@ void BasicChess::PrintBoard() const {
     std::cout << std::endl;
   }
   std::cout << "\t     ";
-  for (uint8_t i = 0; i < width; ++i) {
+  for (uint16_t i = 0; i < width; ++i) {
     std::cout << char(i + 65) << " ";
   }
   std::cout << std::endl;
 }
-void BasicChess::FormatPrint(BoardIndex type, uint8_t row, uint8_t column) const {
+void BasicChess::FormatPrint(BoardIndex type, uint16_t row, uint16_t column) const {
   if (column == 0) {
-    uint8_t row_number = (width - row);
+    uint16_t row_number = row + 1;
     std::cout << "\t" << ((row_number < 10) ?
                           "0" + std::to_string(row_number) : std::to_string(row_number));
   }
@@ -139,12 +138,14 @@ void BasicChess::FormatPrint(BoardIndex type, uint8_t row, uint8_t column) const
   }
 }
 
-int BasicChess::NextStep(std::pair<uint8_t, uint8_t> position) {
-  position.first = width - position.first;
+int BasicChess::NextStep(std::pair<uint16_t, uint16_t> position) {
+//  position.first = width - position.first - 1;
   chessboard[position.first][position.second] =
       this->step_count % 2 == 0 ? BoardIndex::BLACK_CHESS : BoardIndex::WHITE_CHESS;
   this->step_count++;
   this->full_step.push_back(position);
+  system("clear");
+//  system("CLS");
   this->PrintBoard();
   return HasWin();
 }
@@ -176,22 +177,28 @@ int BasicChess::HasWin() {
 
   return false;
 }
-bool BasicChess::Traverse(std::pair<uint8_t, uint8_t> last_step, BoardIndex compare_val, int x_para, int y_para) {
+bool BasicChess::Traverse(std::pair<uint16_t, uint16_t> last_step, BoardIndex compare_val, int x_para, int y_para) {
   int count = 1;
-  for (uint8_t i = 1;; i++) {
-    uint8_t x = last_step.first + (i * x_para), y = last_step.second + (i * y_para);
+  for (uint16_t i = 1;; i++) {
+    uint16_t x = last_step.first + (i * x_para), y = last_step.second + (i * y_para);
     if (x >= width || y >= width) break;
     if (chessboard[x][y] != compare_val) break;
     count++;
   }
 
-  for (uint8_t i = 1; true; i++) {
-    uint8_t x = last_step.first - (i * x_para), y = last_step.second - (i * y_para);
+  for (uint16_t i = 1; true; i++) {
+    uint16_t x = last_step.first - (i * x_para), y = last_step.second - (i * y_para);
     if (x < 0 || y < 0) break;
     if (chessboard[x][y] != compare_val) break;
     count++;
   }
   if (count >= 5) return true;
+  return false;
+}
+bool BasicChess::HasPieceOnPosition(std::pair<uint16_t, uint16_t> position) {
+  if (static_cast<int>(this->chessboard[position.first][position.second]) >= 20) {
+    return true;
+  }
   return false;
 }
 

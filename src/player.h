@@ -26,8 +26,6 @@
 #include <utility>
 #include <iostream>
 
-using namespace std;
-
 namespace ccm {
 class Player {
  private:
@@ -42,11 +40,11 @@ class Player {
   bool IsFirst() const;
   void SetIsFirst(bool is_first);
   explicit Player(bool is_first);
-  Player(bool is_computer, bool is_first, uint8_t score);
+  Player(bool is_computer, bool is_first, uint16_t score);
 
   int Compare(const Player &);
 
-  std::pair<uint8_t,uint8_t> NextStep(int);
+  std::pair<uint16_t,uint16_t> NextStep(int);
 };
 }  // namespace ccm
 
