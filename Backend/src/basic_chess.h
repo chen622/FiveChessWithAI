@@ -56,11 +56,11 @@ class BasicChess {
   // The position of each step
   std::vector<std::pair<uint16_t,uint16_t>> full_step;
   // Print the position symbol by type index.
-  void FormatPrint(BoardIndex type, uint16_t row, uint16_t column) const;
+  static void FormatPrint(BoardIndex type, uint16_t row, uint16_t column) ;
   // Return positive if player1 win the match, 0 if no one has already win.
   int HasWin();
   // A template function to traverse positions nearby the last step.
-  bool Traverse(std::pair<uint16_t, uint16_t> last_step, BoardIndex compare_val, int x_para, int y_para);
+  int Traverse(std::pair<uint16_t, uint16_t> last_step, BoardIndex compare_val, int x_para, int y_para);
  public:
   explicit BasicChess(uint16_t width);
   BasicChess(const BasicChess &);
@@ -75,6 +75,7 @@ class BasicChess {
   int NextStep(std::pair<uint16_t,uint16_t> position);
   // Check the position has piece or not?
   bool HasPieceOnPosition(std::pair<uint16_t,uint16_t> position);
+  bool IsForbidden(std::pair<uint16_t,uint16_t> position);
 };
 }  // namespace ccm
 

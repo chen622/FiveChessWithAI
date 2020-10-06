@@ -25,6 +25,8 @@
 #include <cstdint>
 #include <utility>
 #include <iostream>
+#include <cctype>
+#include <limits>
 
 namespace ccm {
 class Player {
@@ -42,9 +44,9 @@ class Player {
   explicit Player(bool is_first);
   Player(bool is_computer, bool is_first, uint16_t score);
 
-  int Compare(const Player &);
+  int Compare(const Player &) const;
 
-  std::pair<uint16_t,uint16_t> NextStep(int);
+  std::pair<uint16_t,uint16_t> NextStep(int) const;
 };
 }  // namespace ccm
 

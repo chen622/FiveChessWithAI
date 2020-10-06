@@ -46,25 +46,26 @@ void Player::SetIsFirst(bool _is_first) {
   Player::is_first = _is_first;
 }
 
-int Player::Compare(const Player &other_player) {
+int Player::Compare(const Player &other_player) const {
   return this->score - other_player.GetScore();
 }
 
-std::pair<uint16_t, uint16_t> Player::NextStep(int width) {
-  uint row, col;
+std::pair<uint16_t, uint16_t> Player::NextStep(int width) const {
+  int row, col;
   unsigned char col_str;
   do {
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
     std::cin.clear();
-    std::cin.sync();
     std::cout << "轮到 Player" << (is_first ? "1" : "2") << " 落子：";
     std::cin >> row >> col_str;
-    if (std::cin.fail()) std::cout << "输入值异常，请重新输入！" << std::endl;
+    if (std::cin.fail() || isalpha(col_str) == 0) std::cout << "输入值异常，请重新输入！" << std::endl;
     else {
+      if (islower(col_str)) col_str = toupper(col_str);
       col = col_str - 'A';
       row--;
     }
     if (row >= width || col >= width) std::cout << "输入值超出范围，请重新输入！" << std::endl;
-  } while (std::cin.fail() || row >= width || col >= width);
+  } while (std::cin.fail() || isalpha(col_str) == 0 || row >= width || col >= width);
   return {row, col};
 }
 }  // namespace ccm
