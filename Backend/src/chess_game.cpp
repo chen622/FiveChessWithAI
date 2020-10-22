@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
-#include "src/chess_game.h"
+#include "chess_game.h"
 namespace ccm {
 ChessGame::ChessGame(bool has_computer, bool computer_first, uint16_t total_count)
     : total_count(total_count), player1(true), player2(false) {

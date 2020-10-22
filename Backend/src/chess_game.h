@@ -23,8 +23,8 @@
 #define SRC_CHESS_GAME_H_
 #include <cstdint>
 #include <vector>
-#include "src/player.h"
-#include "src/basic_chess.h"
+#include "player.h"
+#include "basic_chess.h"
 
 #define BOARD_SIZE 15  // The size of the board
 

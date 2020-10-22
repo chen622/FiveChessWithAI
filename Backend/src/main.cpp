@@ -21,7 +21,7 @@
 */
 #include <iostream>
 //#include "basic_chess.h"
-#include "src/chess_game.h"
+#include "chess_game.h"
 
 #define TOTAL_MATCH 5
 
