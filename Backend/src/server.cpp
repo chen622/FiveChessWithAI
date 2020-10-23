@@ -19,12 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
-#include "http_server.h"
 #include <memory>
 #include <string>
 #include <iostream>
+#include <unordered_map>
+#include <json/json.h>
+#include <http_server.h>
+#include "chess_game.h"
 
-bool handle_fun1(std::string body, std::string query_string, mg_connection *c, OnRspCallback reply_callback) {
+std::unordered_map<int, ccm::ChessGame> game_map;
+int game_index = 0;
+
+bool handle_fun1(const std::string &body,
+                 const std::string &query_string,
+                 mg_connection *c,
+                 OnRspCallback reply_callback) {
   std::cout << "FUNC: " << __FUNCTION__ << "  "
             << "body: " << body << std::endl;
   std::cout << "FUNC: " << __FUNCTION__ << "  "
@@ -35,48 +44,28 @@ bool handle_fun1(std::string body, std::string query_string, mg_connection *c, O
   return true;
 }
 
-bool handle_fun2(std::string body, std::string query_string, mg_connection *c, OnRspCallback reply_callback) {
-  std::cout << "FUNC: " << __FUNCTION__ << "  "
-            << "body: " << body << std::endl;
-  std::cout << "FUNC: " << __FUNCTION__ << "  "
-            << "query_string: " << query_string << std::endl;
-
-  char n1[100], n2[100];
-  char res[100];
-  double result;
-
-  /* Get form variables */
-  /* string: n1=x&n2=y  */
-  if (!body.empty()) {
-    struct mg_str http_body;
-    http_body.p = body.c_str();
-    http_body.len = body.length();
-    mg_get_http_var(&http_body, "n1", n1, sizeof(n1));
-    mg_get_http_var(&http_body, "n2", n2, sizeof(n2));
-
-  } else if (!query_string.empty()) {
-    struct mg_str http_body;
-    http_body.p = query_string.c_str();
-    http_body.len = query_string.length();
-    mg_get_http_var(&http_body, "n1", n1, sizeof(n1));
-    mg_get_http_var(&http_body, "n2", n2, sizeof(n2));
+bool create_game(const std::string &body,
+                 const std::string &query_string,
+                 mg_connection *c,
+                 OnRspCallback reply_callback) {
+  Json::Value body_json;
+  Json::CharReaderBuilder reader_builder;
+  auto reader = reader_builder.newCharReader();
+  std::string errors;
+  if (reader->parse(body.c_str(),body.c_str()+body.size(), &body_json, &errors)){
+    std::cout<< body_json["h1"]<<std::endl;
   }
-
-  /* Compute the result and send it back as a JSON object */
-  result = strtod(n1, NULL) + strtod(n2, NULL);
-  sprintf(res, "%0.5f", result);
-  reply_callback(c, "200 OK", res);
-
+//  ccm::ChessGame new_game();
   return true;
 }
 
 int main() {
-  std::string port = "7999";
+  std::string port = "8000";
   auto http_server = std::make_shared<HttpServer>();
   http_server->Init(port);
   // add handler
-  http_server->AddHandler("/api/fun1", handle_fun1);
-  http_server->AddHandler("/api/fun2", handle_fun2);
+  http_server->AddHandler("/api/fun1", create_game);
+//  http_server->AddHandler("/api/fun2", handle_fun2);
   http_server->Start();
 
   return 0;

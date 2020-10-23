@@ -1,5 +1,5 @@
 /*
- * https://github.com/tashaxing/CppHttpDemo
+ * https://gitlab.com/zhsun/cpp_mongoose_webserver_demo
  */
 
 #ifndef THIRDPARTY_HTTP_SERVER_H_
@@ -11,9 +11,9 @@
 #include "mongoose.h"
 
 // 定义http返回callback
-typedef void OnRspCallback(mg_connection *c, const char *, std::string);
+using OnRspCallback = void (mg_connection *c, const char *, std::string);
 // 定义http请求handler
-using ReqHandler = std::function<bool(std::string, std::string, mg_connection *c, OnRspCallback)>;
+using ReqHandler = std::function<bool(const std::string &, const std::string &, mg_connection *c, OnRspCallback)>;
 
 class HttpServer {
  public:

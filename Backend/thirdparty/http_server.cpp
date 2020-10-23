@@ -1,5 +1,5 @@
 /*
- * https://github.com/tashaxing/CppHttpDemo
+ * https://gitlab.com/zhsun/cpp_mongoose_webserver_demo
  */
 #include <utility>
 #include "http_server.h"
@@ -32,19 +32,17 @@ struct mg_str upload_fname(struct mg_connection *nc, struct mg_str fname) {
   return fname;
 }
 
-void HttpServer::Init(const std::string &port)
-{
+void HttpServer::Init(const std::string &port) {
   m_port = port;
   s_server_option.enable_directory_listing = "yes";
   s_server_option.document_root = s_web_dir.c_str();
   // TODO：其他设置
 }
 
-bool HttpServer::Start()
-{
+bool HttpServer::Start() {
   mg_mgr_init(&m_mgr, NULL);
   mg_connection *connection = mg_bind(&m_mgr, m_port.c_str(), OnHttpEvent);
-  if (connection == NULL){
+  if (connection == NULL) {
     printf("bind error, using port: %s\n", m_port.c_str());
     return false;
   }
@@ -58,19 +56,17 @@ bool HttpServer::Start()
   return true;
 }
 
-void HttpServer::OnHttpEvent(mg_connection *connection, int event_type, void *event_data)
-{
-  http_message *http_req = (http_message *)event_data;
-  switch (event_type)
-  {
-    case MG_EV_HTTP_REQUEST:{
+void HttpServer::OnHttpEvent(mg_connection *connection, int event_type, void *event_data) {
+  http_message *http_req = (http_message *) event_data;
+  switch (event_type) {
+    case MG_EV_HTTP_REQUEST: {
       HandleEvent(connection, http_req);
       break;
     }
       /* 接收POST方式，提交上传上来的文件，并转存下来 */
     case MG_EV_HTTP_PART_BEGIN:
     case MG_EV_HTTP_PART_DATA:
-    case MG_EV_HTTP_PART_END:{
+    case MG_EV_HTTP_PART_END: {
       struct mg_http_multipart_part *mp =
           (struct mg_http_multipart_part *) event_data;
       printf("file_name: %s, var_name: %s, status: %d\n",
@@ -78,28 +74,24 @@ void HttpServer::OnHttpEvent(mg_connection *connection, int event_type, void *ev
       mg_file_upload_handler(connection, event_type, event_data, upload_fname);
       break;
     }
-    default:
-      break;
+    default:break;
   }
 }
 
-void HttpServer::AddHandler(const std::string &url, ReqHandler req_handler)
-{
+void HttpServer::AddHandler(const std::string &url, ReqHandler req_handler) {
   if (s_handler_map.find(url) != s_handler_map.end())
     return;
 
   s_handler_map.insert(std::make_pair(url, req_handler));
 }
 
-void HttpServer::RemoveHandler(const std::string &url)
-{
+void HttpServer::RemoveHandler(const std::string &url) {
   auto it = s_handler_map.find(url);
   if (it != s_handler_map.end())
     s_handler_map.erase(it);
 }
 
-void HttpServer::SendRsp(mg_connection *connection, const char *status, std::string rsp)
-{
+void HttpServer::SendRsp(mg_connection *connection, const char *status, std::string rsp) {
   // 必须先发送header
   mg_printf(connection, "HTTP/1.1 %s\r\nTransfer-Encoding: chunked\r\n\r\n", status);
   // 以json形式返回
@@ -108,56 +100,51 @@ void HttpServer::SendRsp(mg_connection *connection, const char *status, std::str
   mg_send_http_chunk(connection, "", 0);
 }
 
-void HttpServer::HandleEvent(mg_connection *connection, http_message *http_req)
-{
+void HttpServer::HandleEvent(mg_connection *connection, http_message *http_req) {
   std::string req_str = std::string(http_req->message.p, http_req->message.len);
   std::string body = std::string(http_req->body.p, http_req->body.len);
   std::string query_string = std::string(http_req->query_string.p, http_req->query_string.len);
 
-  printf("got request:\n%s\n", req_str.c_str());
-  printf("body:        %s\n", body.c_str());
-  printf("query_string:%s\n", query_string.c_str());
+//  printf("got request:\n%s\n", req_str.c_str());
+//  printf("body:        %s\n", body.c_str());
+//  printf("query_string:%s\n", query_string.c_str());
 
   // 先过滤是否已注册的函数回调
   std::string url = std::string(http_req->uri.p, http_req->uri.len);
   auto it = s_handler_map.find(url);
-  if (it != s_handler_map.end())
-  {
+  if (it != s_handler_map.end()) {
     ReqHandler handle_func = it->second;
-    handle_func(std::string(http_req->body.p, http_req->body.len),
-                std::string(http_req->query_string.p, http_req->query_string.len), /* 动态请求,？号后面的内容 */
+    handle_func(body,
+                query_string, /* 动态请求,？号后面的内容 */
                 connection, SendRsp);
-    return ;
+    return;
   }
 
   // 其他请求,主要处理html页面打开请求
   char file[100];
   strcpy(file, s_web_dir.c_str());
-  if(url == "/"){
+  if (url == "/") {
     strcat(file, "/index.html");
     url = "/index.html";
-  }
-  else
+  } else
     strcat(file, url.c_str());
 
   struct stat filestat;
   int ret = stat(file, &filestat);
-  if(ret < 0 || S_ISDIR(filestat.st_mode)) //file doesn't exits
+  if (ret < 0 || S_ISDIR(filestat.st_mode)) //file doesn't exits
   {
     mg_printf(
         connection,
         "%s",
         "HTTP/1.1 501 Not Implemented\r\n"
         "Content-Length: 0\r\n\r\n");
-  }
-  else{
+  } else {
     s_server_option.index_files = url.c_str();
     mg_serve_http(connection, http_req, s_server_option);
   }
 }
 
-bool HttpServer::Close()
-{
+bool HttpServer::Close() {
   mg_mgr_free(&m_mgr);
   return true;
 }
