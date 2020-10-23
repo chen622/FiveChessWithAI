@@ -91,6 +91,19 @@ void HttpServer::RemoveHandler(const std::string &url) {
     s_handler_map.erase(it);
 }
 
+void HttpServer::FormatRsp(mg_connection *connection, int code, const Json::Value &rsp) {
+  switch (code) {
+    case 200:
+      SendRsp(connection, "200 OK", rsp.toStyledString());
+      break;
+    case 400:
+      SendRsp(connection, "400 Bad Request", rsp.toStyledString());
+      break;
+    default:
+      SendRsp(connection, "500 Internal Server Error", rsp.toStyledString());
+  }
+}
+
 void HttpServer::SendRsp(mg_connection *connection, const char *status, std::string rsp) {
   // 必须先发送header
   mg_printf(connection, "HTTP/1.1 %s\r\nTransfer-Encoding: chunked\r\n\r\n", status);
@@ -101,9 +114,16 @@ void HttpServer::SendRsp(mg_connection *connection, const char *status, std::str
 }
 
 void HttpServer::HandleEvent(mg_connection *connection, http_message *http_req) {
+
   std::string req_str = std::string(http_req->message.p, http_req->message.len);
-  std::string body = std::string(http_req->body.p, http_req->body.len);
   std::string query_string = std::string(http_req->query_string.p, http_req->query_string.len);
+  Json::Value body;
+  Json::CharReaderBuilder reader_builder;
+  auto reader = reader_builder.newCharReader();
+  std::string errors;
+  if (!reader->parse(http_req->body.p, http_req->body.p + http_req->body.len, &body, &errors)) {
+    std::cerr << "parse body fail" << std::endl;
+  }
 
 //  printf("got request:\n%s\n", req_str.c_str());
 //  printf("body:        %s\n", body.c_str());
@@ -116,7 +136,7 @@ void HttpServer::HandleEvent(mg_connection *connection, http_message *http_req) 
     ReqHandler handle_func = it->second;
     handle_func(body,
                 query_string, /* 动态请求,？号后面的内容 */
-                connection, SendRsp);
+                connection, FormatRsp);
     return;
   }
 
@@ -148,3 +168,4 @@ bool HttpServer::Close() {
   mg_mgr_free(&m_mgr);
   return true;
 }
+

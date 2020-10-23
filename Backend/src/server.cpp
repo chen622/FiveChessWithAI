@@ -30,31 +30,32 @@
 std::unordered_map<int, ccm::ChessGame> game_map;
 int game_index = 0;
 
-bool handle_fun1(const std::string &body,
+//bool handle_fun1(const Json::Value &body,
+//                 const std::string &query_string,
+//                 mg_connection *c,
+//                 OnRspCallback reply_callback) {
+//  std::cout << "FUNC: " << __FUNCTION__ << "  "
+//            << "body: " << body << std::endl;
+//  std::cout << "FUNC: " << __FUNCTION__ << "  "
+//            << "query_string: " << query_string << std::endl;
+//
+//  reply_callback(c, "200 OK", "success");
+//
+//  return true;
+//}
+
+bool create_game(const Json::Value &body,
                  const std::string &query_string,
                  mg_connection *c,
                  OnRspCallback reply_callback) {
-  std::cout << "FUNC: " << __FUNCTION__ << "  "
-            << "body: " << body << std::endl;
-  std::cout << "FUNC: " << __FUNCTION__ << "  "
-            << "query_string: " << query_string << std::endl;
-
-  reply_callback(c, "200 OK", "success");
-
-  return true;
-}
-
-bool create_game(const std::string &body,
-                 const std::string &query_string,
-                 mg_connection *c,
-                 OnRspCallback reply_callback) {
-  Json::Value body_json;
-  Json::CharReaderBuilder reader_builder;
-  auto reader = reader_builder.newCharReader();
-  std::string errors;
-  if (reader->parse(body.c_str(),body.c_str()+body.size(), &body_json, &errors)){
-    std::cout<< body_json["h1"]<<std::endl;
+  std::cout << body.toStyledString() << std::endl;
+  if (!body.isMember("hasComputer") || !body.isMember("computerFirst")){
+    reply_callback
   }
+  Json::Value rsp;
+  ccm::ChessGame new_game;
+
+  reply_callback(c, 200, rsp);
 //  ccm::ChessGame new_game();
   return true;
 }
