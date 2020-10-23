@@ -20,8 +20,8 @@
  * SOFTWARE.
 */
 #include <iostream>
-//#include "basic_chess.h"
 #include "chess_game.h"
+//#include "mongoose.h"
 
 #define TOTAL_MATCH 5
 

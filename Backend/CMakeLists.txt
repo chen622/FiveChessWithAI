@@ -3,7 +3,7 @@ project(FiveChessWithAI)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_subdirectory(src)
+add_subdirectory(thirdparty)
+include_directories(thirdparty)
 
-add_executable(fivechess ${CMAKE_SOURCE_DIR}/src/main.cpp)
-target_link_libraries(fivechess fivechess_src)
+add_subdirectory(src bin)
