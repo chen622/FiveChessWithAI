@@ -50,8 +50,8 @@ int Player::Compare(const Player &other_player) const {
   return this->score - other_player.GetScore();
 }
 
-std::pair<uint16_t, uint16_t> Player::NextStep(int width) const {
-  int row, col;
+std::pair<int16_t, int16_t> Player::NextStep(int width) const {
+  int16_t row, col;
   unsigned char col_str;
   do {
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');

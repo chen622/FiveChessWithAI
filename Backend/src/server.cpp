@@ -50,10 +50,10 @@ bool create_game(const Json::Value &body,
                  OnRspCallback reply_callback) {
   std::cout << body.toStyledString() << std::endl;
   if (!body.isMember("hasComputer") || !body.isMember("computerFirst")){
-    reply_callback
+//    reply_callback()
   }
   Json::Value rsp;
-  ccm::ChessGame new_game;
+  ccm::ChessGame new_game(body["hasComputer"].asBool(), body["computerFirst"].asBool(), 5);
 
   reply_callback(c, 200, rsp);
 //  ccm::ChessGame new_game();

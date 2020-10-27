@@ -36,7 +36,7 @@ namespace ccm {
 class ChessGame {
  private:
   // The step_count of matches already finished
-  uint16_t count;
+  uint16_t count{};
   // The step_count of matches which need to finish
   uint16_t total_count;
   Player player1;

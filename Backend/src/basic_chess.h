@@ -31,7 +31,7 @@
 namespace ccm {
 
 // The enum class to record the index of each board type.
-enum class BoardIndex{
+enum class BoardIndex {
   CENTER = 0,
   LEFT_TOP = 1,
   RIGHT_TOP = 2,
@@ -49,33 +49,41 @@ enum class BoardIndex{
 
 class BasicChess {
  private:
-  uint16_t width;
+  int16_t width;
   BoardIndex **chessboard;
   // The step has already happened
   uint32_t step_count;
   // The position of each step
-  std::vector<std::pair<uint16_t,uint16_t>> full_step;
+  std::vector<std::pair<int16_t , int16_t>> full_step;
   // Print the position symbol by type index.
-  static void FormatPrint(BoardIndex type, uint16_t row, uint16_t column) ;
+  static void FormatPrint(BoardIndex type, int16_t row, int16_t column);
   // Return positive if player1 win the match, 0 if no one has already win.
   int HasWin();
   // A template function to traverse positions nearby the last step.
-  int Traverse(std::pair<uint16_t, uint16_t> last_step, BoardIndex compare_val, int x_para, int y_para);
+  // Para(0,1): vertical; Para(1,0): horizontal; Para(1,1): left bottom to right top
+  int Traverse(std::pair<int16_t, int16_t> last_step, BoardIndex compare_val, int x_para, int y_para);
+  // Check is overline(more than or equal 6) happen or not
+  bool IsOverLine(std::pair<int16_t, int16_t> position);
+  // Check is the count of four more than or equal 2 or not
+  bool IsDoubleFour(std::pair<int16_t, int16_t> position);
+  // Fill in a four and check has five or not.
+  // Param see function Traverse()
+  bool FillInFourAndCheckFive(std::pair<int16_t, int16_t> position, int x_para, int y_para);
  public:
-  explicit BasicChess(uint16_t width);
+  explicit BasicChess(int16_t width);
   BasicChess(const BasicChess &);
-  uint16_t GetWidth() const;
+  int16_t GetWidth() const;
   BoardIndex **GetChessboard() const;
-  uint32_t GetStepCount() const;
-  const std::vector<std::pair<uint16_t, uint16_t>> &GetFullStep() const;
 
+  uint32_t GetStepCount() const;
+  const std::vector<std::pair<int16_t, int16_t>> &GetFullStep() const;
   // Print the board in the console.
   void PrintBoard() const;
   // Set a piece into the board.
-  int NextStep(std::pair<uint16_t,uint16_t> position);
+  int NextStep(std::pair<int16_t, int16_t> position);
   // Check the position has piece or not?
-  bool HasPieceOnPosition(std::pair<uint16_t,uint16_t> position);
-  bool IsForbidden(std::pair<uint16_t,uint16_t> position);
+  bool HasPieceOnPosition(std::pair<int16_t, int16_t> position);
+  bool IsForbidden(std::pair<int16_t, int16_t> position);
 };
 }  // namespace ccm
 

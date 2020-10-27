@@ -1,7 +1,7 @@
 /*
  * MIT License
- *
- * Copyright (c) $YEAR Chenming C (ccm@ccm.ink)
+ * 
+ * Copyright (c) 2020 Chenming C (ccm@ccm.ink)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,35 +19,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
-#ifndef SRC_PLAYER_H_
-#define SRC_PLAYER_H_
-
-#include <cstdint>
-#include <utility>
-#include <iostream>
-#include <cctype>
-#include <limits>
-
-namespace ccm {
-class Player {
- private:
-  int score;  // 分数
-  bool is_computer;  // 是否为电脑
-  bool is_first;  // 是否为先手
- public:
-  int GetScore() const;
-  void SetScore(int score);
-  bool IsComputer() const;
-  void SetIsComputer(bool is_computer);
-  bool IsFirst() const;
-  void SetIsFirst(bool is_first);
-  explicit Player(bool is_first);
-  Player(bool is_computer, bool is_first, uint16_t score);
-
-  int Compare(const Player &) const;
-
-  std::pair<int16_t,int16_t> NextStep(int) const;
-};
-}  // namespace ccm
-
-#endif  // SRC_PLAYER_H_
+#include "resp_format.h"
