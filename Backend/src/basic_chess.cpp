@@ -205,12 +205,13 @@ bool BasicChess::HasPieceOnPosition(std::pair<int16_t, int16_t> position) {
 }
 
 bool BasicChess::IsForbidden(std::pair<int16_t, int16_t> position) {
-  if (this->HasPieceOnPosition(position)) {  // check is already has piece or not
-    return false;
-  }
+//  if (this->HasPieceOnPosition(position)) {  // check is already has piece or not
+//    return false;
+//  }
   auto old_value = this->chessboard[position.first][position.second];
   this->chessboard[position.first][position.second] = BoardIndex::BLACK_CHESS;
-  if (this->IsOverLine(position) || this->IsDoubleFour(position)) {
+  this->IsDoubleThree(position);
+  if (this->IsOverLine(position) || this->IsDoubleFour(position) || this->IsDoubleThree(position)) {
     this->chessboard[position.first][position.second] = old_value;
     return true;
   }
@@ -244,7 +245,12 @@ bool BasicChess::FillInFourAndCheckFive(std::pair<int16_t, int16_t> position, in
   while (position.first >= 0 && position.second >= 0 && position.first < this->width
       && position.second < this->width) {
     if (static_cast<int>(this->chessboard[position.first][position.second]) < 20) {  // if has blank position
+      if ((x_para < 0 || x_para == 0 && y_para == -1)
+          && this->Traverse(position, BoardIndex::BLACK_CHESS, x_para, y_para) == 4) { //避免活四被重复计算
+        return false;
+      }
       auto old_val = this->chessboard[position.first][position.second];
+      this->chessboard[position.first][position.second] = BoardIndex::BLACK_CHESS;
       if (this->Traverse(position, BoardIndex::BLACK_CHESS, x_para, y_para) == 5) {
         this->chessboard[position.first][position.second] = old_val;
         return true;
@@ -259,4 +265,37 @@ bool BasicChess::FillInFourAndCheckFive(std::pair<int16_t, int16_t> position, in
   return false;
 }
 
+bool BasicChess::IsDoubleThree(std::pair<int16_t, int16_t> position) {
+  if ((this->FillInThreeAndCheckFour(position, -1, 0) | this->FillInThreeAndCheckFour(position, 1, 0))
+      + (this->FillInThreeAndCheckFour(position, 0, -1) | this->FillInThreeAndCheckFour(position, 0, 1))
+      + (this->FillInThreeAndCheckFour(position, -1, -1) | this->FillInThreeAndCheckFour(position, 1, 1))
+      + (this->FillInThreeAndCheckFour(position, -1, 1) | this->FillInThreeAndCheckFour(position, 1, -1)) >= 2) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool BasicChess::FillInThreeAndCheckFour(std::pair<int16_t, int16_t> position, int x_para, int y_para) {
+  while (position.first >= 0 && position.second >= 0 && position.first < this->width
+      && position.second < this->width
+      && this->chessboard[position.first][position.second] != BoardIndex::WHITE_CHESS) {
+    if (static_cast<int>(this->chessboard[position.first][position.second]) < 20) {  // if has blank position
+      auto old_val = this->chessboard[position.first][position.second];
+      this->chessboard[position.first][position.second] = BoardIndex::BLACK_CHESS;
+      if (this->Traverse(position, BoardIndex::BLACK_CHESS, x_para, y_para) == 4
+          && this->FillInFourAndCheckFive(position, x_para, y_para)
+          && this->FillInFourAndCheckFive(position, -x_para, -y_para)) {
+        this->chessboard[position.first][position.second] = old_val;
+        return true;
+      } else {
+        this->chessboard[position.first][position.second] = old_val;
+        break;
+      }
+    }
+    position.first += x_para;
+    position.second += y_para;
+  }
+  return false;
+}
 }  // namespace ccm

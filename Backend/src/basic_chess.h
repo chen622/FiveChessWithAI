@@ -62,13 +62,18 @@ class BasicChess {
   // A template function to traverse positions nearby the last step.
   // Para(0,1): vertical; Para(1,0): horizontal; Para(1,1): left bottom to right top
   int Traverse(std::pair<int16_t, int16_t> last_step, BoardIndex compare_val, int x_para, int y_para);
-  // Check is overline(more than or equal 6) happen or not
+  // Check is overline(more than or equal 6) happen or not.
   bool IsOverLine(std::pair<int16_t, int16_t> position);
-  // Check is the count of four more than or equal 2 or not
+  // Check is the count of four more than or equal 2.
   bool IsDoubleFour(std::pair<int16_t, int16_t> position);
   // Fill in a four and check has five or not.
   // Param see function Traverse()
   bool FillInFourAndCheckFive(std::pair<int16_t, int16_t> position, int x_para, int y_para);
+  // Check is the count of three more than or equal 2.
+  bool IsDoubleThree(std::pair<int16_t, int16_t> position);
+  // Fill in a three and check has four or not.
+  // Param see function Traverse()
+  bool FillInThreeAndCheckFour(std::pair<int16_t, int16_t> position, int x_para, int y_para);
  public:
   explicit BasicChess(int16_t width);
   BasicChess(const BasicChess &);
