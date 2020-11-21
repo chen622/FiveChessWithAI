@@ -1,7 +1,7 @@
 /*
  * MIT License
- *
- * Copyright (c) $YEAR Chenming C (ccm@ccm.ink)
+ * 
+ * Copyright (c) 2020 Chenming C (ccm@ccm.ink)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,32 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
-#include <iostream>
-#include "chess_game.h"
-//#include "mongoose.h"
+#ifndef SRC_DECISION_TREE_H_
+#define SRC_DECISION_TREE_H_
 
-#define TOTAL_MATCH 5
+#include "tree_node.h"
 
-using namespace ccm;
-using namespace std;
-
-int main() {
-  cout << "欢迎体验Chenming的五子棋！" << endl;
-  cout << "请首先选择游戏模式：\n\t0：人人对战\t1：人机对战(人先)" << endl;
-  int type = 0;
-  do {
-    cin.clear();
-    cout << "请输入您的选择：";
-    cin >> type;
-    if (cin.fail() || (type != 0) && type != 1) cout << "输入异常，请重新输入！" << endl;
-  } while (cin.fail());
-
-  if (type == 1) {
-    ChessGame game(true, false, TOTAL_MATCH);
-    game.Playing();
-  } else {
-    ChessGame game(type, false, TOTAL_MATCH);
-    game.Playing();
-  }
-  return 0;
-}
+#endif // SRC_DECISION_TREE_H_
