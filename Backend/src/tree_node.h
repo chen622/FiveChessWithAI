@@ -21,10 +21,14 @@
 */
 #ifndef SRC_TREE_NODE_H_
 #define SRC_TREE_NODE_H_
+#include <algorithm>
+#include <chrono>
+#include <random>
+#include <set>
 #include "basic_chess.h"
 #include "chess_game.h"
-#include <algorithm>
 #define MAX_DEPTH 3
+#define INFINITY_SCORE 1000000
 
 namespace ccm {
 
@@ -34,7 +38,7 @@ struct Pattern {
 };
 
 std::vector<Pattern> patterns = {
-    {"11111", 50000},
+    {"11111", INFINITY_SCORE},
     {"011110", 4320},
     {"011100", 720},
     {"001110", 720},
@@ -56,14 +60,24 @@ class TreeNode {
  private:
   int depth;
   bool type; // true is max
+  int alpha = -INFINITY_SCORE;
+  int beta = INFINITY_SCORE;
+  std::set<TreeNode> children_nodes = {};
   bool is_black; // is first or not
   int line_score[2][BOARD_SIZE * 6 - 2]{0};
   int total_score[2]{0};
+  std::vector<POS_PAIR > possible_positions = {POS_PAIR((BOARD_SIZE - 1) / 2, (BOARD_SIZE - 1) / 2),};
   BasicChess basic_chess;
  public:
   TreeNode(bool is_black, const BasicChess &);
-  TreeNode(const TreeNode &last_node, std::pair<int16_t, int16_t> position);
-  int UpdateScore(std::pair<int16_t, int16_t> position);
+  // This constructor is used to init a decision tree.
+  TreeNode(const TreeNode &last_node, POS_PAIR position);
+  // This constructor is used to create a child node of a decision tree.
+  TreeNode(POS_PAIR position, TreeNode *father_node);
+  int UpdateScore(POS_PAIR position);
+  void AddPossiblePosition(POS_PAIR);
+  int ABSearch();
+  POS_PAIR GetGoodMove();
 };
 }
 

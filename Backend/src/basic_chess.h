@@ -28,6 +28,8 @@
 #include <utility>
 #include <vector>
 
+#define POS_PAIR std::pair<int16_t,int16_t>
+
 namespace ccm {
 
 // The enum class to record the index of each board type.
@@ -54,26 +56,26 @@ class BasicChess {
   // The step has already happened
   uint32_t step_count;
   // The position of each step
-  std::vector<std::pair<int16_t , int16_t>> full_step;
+  std::vector<POS_PAIR> full_step;
   // Print the position symbol by type index.
   static void FormatPrint(BoardIndex type, int16_t row, int16_t column);
   // Return positive if player1 win the match, 0 if no one has already win.
   int HasWin();
   // A template function to traverse positions nearby the last step.
   // Para(0,1): vertical; Para(1,0): horizontal; Para(1,1): left bottom to right top
-  int Traverse(std::pair<int16_t, int16_t> last_step, BoardIndex compare_val, int x_para, int y_para);
+  int Traverse(POS_PAIR last_step, BoardIndex compare_val, int x_para, int y_para);
   // Check is overline(more than or equal 6) happen or not.
-  bool IsOverLine(std::pair<int16_t, int16_t> position);
+  bool IsOverLine(POS_PAIR position);
   // Check is the count of four more than or equal 2.
-  bool IsDoubleFour(std::pair<int16_t, int16_t> position);
+  bool IsDoubleFour(POS_PAIR position);
   // Fill in a four and check has five or not.
   // Param see function Traverse()
-  bool FillInFourAndCheckFive(std::pair<int16_t, int16_t> position, int x_para, int y_para);
+  bool FillInFourAndCheckFive(POS_PAIR position, int x_para, int y_para);
   // Check is the count of three more than or equal 2.
-  bool IsDoubleThree(std::pair<int16_t, int16_t> position);
+  bool IsDoubleThree(POS_PAIR position);
   // Fill in a three and check has four or not.
   // Param see function Traverse()
-  bool FillInThreeAndCheckFour(std::pair<int16_t, int16_t> position, int x_para, int y_para);
+  bool FillInThreeAndCheckFour(POS_PAIR position, int x_para, int y_para);
  public:
   explicit BasicChess(int16_t width);
   BasicChess(const BasicChess &);
@@ -81,14 +83,14 @@ class BasicChess {
   BoardIndex **GetChessboard() const;
 
   uint32_t GetStepCount() const;
-  const std::vector<std::pair<int16_t, int16_t>> &GetFullStep() const;
+  const std::vector<POS_PAIR> &GetFullStep() const;
   // Print the board in the console.
   void PrintBoard() const;
   // Set a piece into the board.
-  int NextStep(std::pair<int16_t, int16_t> position);
+  int NextStep(POS_PAIR position);
   // Check the position has piece or not?
-  bool HasPieceOnPosition(std::pair<int16_t, int16_t> position);
-  bool IsForbidden(std::pair<int16_t, int16_t> position);
+  bool HasPieceOnPosition(POS_PAIR position);
+  bool IsForbidden(POS_PAIR position);
 };
 }  // namespace ccm
 

@@ -24,4 +24,6 @@
 
 #include "tree_node.h"
 
+
+}
 #endif // SRC_DECISION_TREE_H_

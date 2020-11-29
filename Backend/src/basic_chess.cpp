@@ -58,7 +58,6 @@ BasicChess::BasicChess(const BasicChess &other_chess)
   for (const auto &other_step : other_chess.GetFullStep()) {
     full_step.push_back(other_step);
   }
-
   chessboard = new BoardIndex *[width];
 
   const auto &board = other_chess.GetChessboard();
@@ -79,12 +78,12 @@ uint32_t BasicChess::GetStepCount() const {
   return step_count;
 }
 
-const std::vector<std::pair<int16_t, int16_t>> &BasicChess::GetFullStep() const {
+const std::vector<POS_PAIR > &BasicChess::GetFullStep() const {
   return full_step;
 }
 
 void BasicChess::PrintBoard() const {
-  const auto &last = this->full_step.empty() ? std::pair<int16_t, int16_t>(-1, -1) : this->full_step.back();
+  const auto &last = this->full_step.empty() ? POS_PAIR(-1, -1) : this->full_step.back();
   for (int16_t i = width - 1; i >= 0; --i) {
     for (int16_t j = 0; j < width; ++j) {
       if (i == last.first && j == last.second) {
@@ -139,7 +138,7 @@ void BasicChess::FormatPrint(BoardIndex type, int16_t row, int16_t column) {
   }
 }
 
-int BasicChess::NextStep(std::pair<int16_t, int16_t> position) {
+int BasicChess::NextStep(POS_PAIR position) {
 //  position.first = width - position.first - 1;
   chessboard[position.first][position.second] =
       this->step_count % 2 == 0 ? BoardIndex::BLACK_CHESS : BoardIndex::WHITE_CHESS;
@@ -179,7 +178,7 @@ int BasicChess::HasWin() {
   return false;
 }
 
-int BasicChess::Traverse(std::pair<int16_t, int16_t> last_step, BoardIndex compare_val, int x_para, int y_para) {
+int BasicChess::Traverse(POS_PAIR last_step, BoardIndex compare_val, int x_para, int y_para) {
   int count = 1;
   for (int16_t i = 1;; i++) {
     int16_t x = last_step.first + (i * x_para), y = last_step.second + (i * y_para);
@@ -197,14 +196,14 @@ int BasicChess::Traverse(std::pair<int16_t, int16_t> last_step, BoardIndex compa
   return count;
 }
 
-bool BasicChess::HasPieceOnPosition(std::pair<int16_t, int16_t> position) {
+bool BasicChess::HasPieceOnPosition(POS_PAIR position) {
   if (static_cast<int>(this->chessboard[position.first][position.second]) >= 20) {
     return true;
   }
   return false;
 }
 
-bool BasicChess::IsForbidden(std::pair<int16_t, int16_t> position) {
+bool BasicChess::IsForbidden(POS_PAIR position) {
 //  if (this->HasPieceOnPosition(position)) {  // check is already has piece or not
 //    return false;
 //  }
@@ -219,7 +218,7 @@ bool BasicChess::IsForbidden(std::pair<int16_t, int16_t> position) {
   return false;
 }
 
-bool BasicChess::IsOverLine(std::pair<int16_t, int16_t> position) {
+bool BasicChess::IsOverLine(POS_PAIR position) {
   if (this->Traverse(position, BoardIndex::BLACK_CHESS, 0, 1) >= 6
       || this->Traverse(position, BoardIndex::BLACK_CHESS, 1, 0) >= 6
       || this->Traverse(position, BoardIndex::BLACK_CHESS, 1, 1) >= 6
@@ -230,7 +229,7 @@ bool BasicChess::IsOverLine(std::pair<int16_t, int16_t> position) {
   }
 }
 
-bool BasicChess::IsDoubleFour(std::pair<int16_t, int16_t> position) {
+bool BasicChess::IsDoubleFour(POS_PAIR position) {
   if (this->FillInFourAndCheckFive(position, -1, 0) + this->FillInFourAndCheckFive(position, 1, 0)
       + this->FillInFourAndCheckFive(position, 0, -1) + this->FillInFourAndCheckFive(position, 0, 1)
       + this->FillInFourAndCheckFive(position, -1, -1) + this->FillInFourAndCheckFive(position, 1, 1)
@@ -241,7 +240,7 @@ bool BasicChess::IsDoubleFour(std::pair<int16_t, int16_t> position) {
   }
 }
 
-bool BasicChess::FillInFourAndCheckFive(std::pair<int16_t, int16_t> position, int x_para, int y_para) {
+bool BasicChess::FillInFourAndCheckFive(POS_PAIR position, int x_para, int y_para) {
   while (position.first >= 0 && position.second >= 0 && position.first < this->width
       && position.second < this->width) {
     if (static_cast<int>(this->chessboard[position.first][position.second]) < 20) {  // if has blank position
@@ -265,7 +264,7 @@ bool BasicChess::FillInFourAndCheckFive(std::pair<int16_t, int16_t> position, in
   return false;
 }
 
-bool BasicChess::IsDoubleThree(std::pair<int16_t, int16_t> position) {
+bool BasicChess::IsDoubleThree(POS_PAIR position) {
   if ((this->FillInThreeAndCheckFour(position, -1, 0) | this->FillInThreeAndCheckFour(position, 1, 0))
       + (this->FillInThreeAndCheckFour(position, 0, -1) | this->FillInThreeAndCheckFour(position, 0, 1))
       + (this->FillInThreeAndCheckFour(position, -1, -1) | this->FillInThreeAndCheckFour(position, 1, 1))
@@ -276,7 +275,7 @@ bool BasicChess::IsDoubleThree(std::pair<int16_t, int16_t> position) {
   }
 }
 
-bool BasicChess::FillInThreeAndCheckFour(std::pair<int16_t, int16_t> position, int x_para, int y_para) {
+bool BasicChess::FillInThreeAndCheckFour(POS_PAIR position, int x_para, int y_para) {
   while (position.first >= 0 && position.second >= 0 && position.first < this->width
       && position.second < this->width
       && this->chessboard[position.first][position.second] != BoardIndex::WHITE_CHESS) {

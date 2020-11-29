@@ -26,13 +26,25 @@ char GetCharOfPosition(BoardIndex index, BoardIndex my, BoardIndex rival);
 TreeNode::TreeNode(bool is_black, const BasicChess &basic_chess)
     : depth(0), type(true), is_black(is_black), basic_chess(basic_chess) {
 }
-TreeNode::TreeNode(const TreeNode &last_node, std::pair<int16_t, int16_t> position)
+TreeNode::TreeNode(const TreeNode &last_node, POS_PAIR position)
     : depth(0), type(true), is_black(!last_node.is_black), basic_chess(last_node.basic_chess) {
   this->basic_chess.NextStep(position);
-  int a = this->UpdateScore(position);
-  std::cout<<a;
+  this->UpdateScore(position);
+  this->AddPossiblePosition(position);
 }
-int TreeNode::UpdateScore(std::pair<int16_t, int16_t> position) {
+TreeNode::TreeNode(POS_PAIR position, TreeNode *father_node)
+    : depth(father_node->depth + 1),
+      type(!father_node->type),
+      is_black(father_node->is_black),
+      basic_chess(father_node->basic_chess),
+      alpha(father_node->alpha),
+      beta(father_node->beta) {
+  this->basic_chess.NextStep(position);
+  this->UpdateScore(position);
+  this->AddPossiblePosition(position);
+}
+
+int TreeNode::UpdateScore(POS_PAIR position) {
   std::string my_lines[4];
   std::string rival_lines[4];
   BoardIndex my_index = this->is_black ? BoardIndex::BLACK_CHESS : BoardIndex::WHITE_CHESS;
@@ -104,6 +116,85 @@ int TreeNode::UpdateScore(std::pair<int16_t, int16_t> position) {
     total_score[i] += line_score[i][a] + line_score[i][b] + line_score[i][c] + line_score[i][d];
   }
   return total_score[0] - total_score[1] - old_score;
+}
+
+void TreeNode::AddPossiblePosition(POS_PAIR position) {
+  const auto &board = this->basic_chess.GetChessboard();
+  std::remove(this->possible_positions.begin(), this->possible_positions.end(), position);
+  for (int i = 0; i < 8; ++i) {
+    POS_PAIR temp_position = POS_PAIR(position);
+    for (int j = 0; j < 2; ++j) {
+      switch (i) {
+        case 0:temp_position.first++;
+          break;
+        case 1:temp_position.first++;
+          temp_position.second++;
+          break;
+        case 2:temp_position.second++;
+          break;
+        case 3:temp_position.first--;
+          temp_position.second++;
+          break;
+        case 4:temp_position.first--;
+          break;
+        case 5:temp_position.first--;
+          temp_position.second--;
+          break;
+        case 6:temp_position.second--;
+          break;
+        case 7:temp_position.second--;
+          temp_position.first++;
+          break;
+        default:break;
+      }
+      if (temp_position.first >= 0 && temp_position.first < this->basic_chess.GetWidth()
+          && temp_position.second >= 0 && temp_position.second < this->basic_chess.GetWidth()
+          && !this->basic_chess.HasPieceOnPosition(temp_position)) {
+        this->possible_positions.push_back(temp_position);
+      }
+    }
+  }
+}
+
+int TreeNode::ABSearch() {
+  int retVal = this->type ? this->alpha : this->beta;
+  if (this->depth >= MAX_DEPTH) {
+    return this->total_score[0] - this->total_score[1];
+  }
+  // Random sort the possible position
+  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  std::shuffle(this->possible_positions.begin(), this->possible_positions.end(), std::default_random_engine(seed));
+
+  for (const auto &position: this->possible_positions) {
+    TreeNode child_node = TreeNode(position, this);
+    int child_score = child_node.ABSearch();
+    if (this->type) { // MAX
+      if (child_score > this->alpha) {
+        this->alpha = child_score;
+        retVal = child_score;
+      }
+    } else { //MIN
+      if (child_score < this->beta) {
+        this->beta = child_score;
+        retVal = child_score;
+      }
+    }
+    if (this->alpha >= this->beta) {
+      break;
+    } else {
+      this->children_nodes.insert(child_node);
+    }
+  }
+  return retVal;
+}
+POS_PAIR TreeNode::GetGoodMove() {
+  int max_score = this->ABSearch();
+  for (const auto &child: children_nodes) {
+    if (child.beta == max_score) {
+      return child.basic_chess.GetFullStep().back();
+    }
+  }
+  return POS_PAIR(-1, -1);
 }
 
 char GetCharOfPosition(BoardIndex index, BoardIndex my, BoardIndex rival) {

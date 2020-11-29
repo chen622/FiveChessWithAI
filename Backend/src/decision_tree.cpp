@@ -23,8 +23,10 @@
 
 namespace ccm {
 
-TreeNode getAGoodStep(const TreeNode &last_node, std::pair<int16_t, int16_t> position) {
-  TreeNode *current_node = new TreeNode(last_node, position);
+TreeNode getAGoodStep(const TreeNode &last_node, POS_PAIR position) {
+  TreeNode current_node = TreeNode(last_node, position);
+  current_node.ABSearch();
+
 
 }
 }
