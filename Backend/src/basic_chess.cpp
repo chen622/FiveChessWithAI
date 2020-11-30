@@ -138,16 +138,19 @@ void BasicChess::FormatPrint(BoardIndex type, int16_t row, int16_t column) {
   }
 }
 
-int BasicChess::NextStep(POS_PAIR position) {
+int BasicChess::NextStep(POS_PAIR position,bool silently) {
 //  position.first = width - position.first - 1;
   chessboard[position.first][position.second] =
       this->step_count % 2 == 0 ? BoardIndex::BLACK_CHESS : BoardIndex::WHITE_CHESS;
   this->step_count++;
   this->full_step.push_back(position);
-  system("clear");
+  if (!silently){
+    system("clear");
 //  system("CLS");
-  this->PrintBoard();
-  return HasWin();
+    this->PrintBoard();
+    return HasWin();
+  }
+  return 0;
 }
 
 int BasicChess::HasWin() {
@@ -180,7 +183,7 @@ int BasicChess::HasWin() {
 
 int BasicChess::Traverse(POS_PAIR last_step, BoardIndex compare_val, int x_para, int y_para) {
   int count = 1;
-  for (int16_t i = 1;; i++) {
+  for (int16_t i = 1;true; i++) {
     int16_t x = last_step.first + (i * x_para), y = last_step.second + (i * y_para);
     if (x >= width || y >= width || x < 0 || y < 0) break;
     if (chessboard[x][y] != compare_val) break;
@@ -209,7 +212,6 @@ bool BasicChess::IsForbidden(POS_PAIR position) {
 //  }
   auto old_value = this->chessboard[position.first][position.second];
   this->chessboard[position.first][position.second] = BoardIndex::BLACK_CHESS;
-  this->IsDoubleThree(position);
   if (this->IsOverLine(position) || this->IsDoubleFour(position) || this->IsDoubleThree(position)) {
     this->chessboard[position.first][position.second] = old_value;
     return true;
@@ -244,8 +246,8 @@ bool BasicChess::FillInFourAndCheckFive(POS_PAIR position, int x_para, int y_par
   while (position.first >= 0 && position.second >= 0 && position.first < this->width
       && position.second < this->width) {
     if (static_cast<int>(this->chessboard[position.first][position.second]) < 20) {  // if has blank position
-      if ((x_para < 0 || x_para == 0 && y_para == -1)
-          && this->Traverse(position, BoardIndex::BLACK_CHESS, x_para, y_para) == 4) { //避免活四被重复计算
+      if (!(x_para <= 0 && y_para <= 0)
+          && this->Traverse(position, BoardIndex::BLACK_CHESS, x_para, y_para) == 5) { //避免活四被重复计算
         return false;
       }
       auto old_val = this->chessboard[position.first][position.second];

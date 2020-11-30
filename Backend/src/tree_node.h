@@ -26,7 +26,6 @@
 #include <random>
 #include <set>
 #include "basic_chess.h"
-#include "chess_game.h"
 #define MAX_DEPTH 3
 #define INFINITY_SCORE 1000000
 
@@ -37,7 +36,7 @@ struct Pattern {
   int score;
 };
 
-std::vector<Pattern> patterns = {
+static std::vector<Pattern> patterns_score = {
     {"11111", INFINITY_SCORE},
     {"011110", 4320},
     {"011100", 720},
@@ -62,21 +61,21 @@ class TreeNode {
   bool type; // true is max
   int alpha = -INFINITY_SCORE;
   int beta = INFINITY_SCORE;
-  std::set<TreeNode> children_nodes = {};
+  std::vector<TreeNode> children_nodes = {};
   bool is_black; // is first or not
   int line_score[2][BOARD_SIZE * 6 - 2]{0};
   int total_score[2]{0};
-  std::vector<POS_PAIR > possible_positions = {POS_PAIR((BOARD_SIZE - 1) / 2, (BOARD_SIZE - 1) / 2),};
+  std::vector<POS_PAIR > possible_positions = {};
   BasicChess basic_chess;
- public:
-  TreeNode(bool is_black, const BasicChess &);
-  // This constructor is used to init a decision tree.
-  TreeNode(const TreeNode &last_node, POS_PAIR position);
   // This constructor is used to create a child node of a decision tree.
   TreeNode(POS_PAIR position, TreeNode *father_node);
   int UpdateScore(POS_PAIR position);
   void AddPossiblePosition(POS_PAIR);
   int ABSearch();
+ public:
+  TreeNode(bool is_black, const BasicChess &);
+  // This constructor is used to init a decision tree.
+  TreeNode(const TreeNode &last_node, POS_PAIR position);
   POS_PAIR GetGoodMove();
 };
 }

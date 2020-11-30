@@ -36,7 +36,7 @@ class Player {
   bool is_first;  // 是否为先手
  public:
   int GetScore() const;
-  void SetScore(int score);
+  void AddScore(int score);
   bool IsComputer() const;
   void SetIsComputer(bool is_computer);
   bool IsFirst() const;

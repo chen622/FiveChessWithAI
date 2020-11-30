@@ -21,14 +21,18 @@
 */
 #include "tree_node.h"
 namespace ccm {
+
 char GetCharOfPosition(BoardIndex index, BoardIndex my, BoardIndex rival);
 
 TreeNode::TreeNode(bool is_black, const BasicChess &basic_chess)
     : depth(0), type(true), is_black(is_black), basic_chess(basic_chess) {
+  if (is_black) {
+    this->possible_positions.emplace_back((BOARD_SIZE - 1) / 2, (BOARD_SIZE - 1) / 2);
+  }
 }
 TreeNode::TreeNode(const TreeNode &last_node, POS_PAIR position)
     : depth(0), type(true), is_black(!last_node.is_black), basic_chess(last_node.basic_chess) {
-  this->basic_chess.NextStep(position);
+  this->basic_chess.NextStep(position, true);
   this->UpdateScore(position);
   this->AddPossiblePosition(position);
 }
@@ -39,7 +43,7 @@ TreeNode::TreeNode(POS_PAIR position, TreeNode *father_node)
       basic_chess(father_node->basic_chess),
       alpha(father_node->alpha),
       beta(father_node->beta) {
-  this->basic_chess.NextStep(position);
+  this->basic_chess.NextStep(position, true);
   this->UpdateScore(position);
   this->AddPossiblePosition(position);
 }
@@ -84,7 +88,7 @@ int TreeNode::UpdateScore(POS_PAIR position) {
   int rival_line_scores[4]{0};
 
   for (int i = 0; i < 4; ++i) {
-    for (const auto &pattern: patterns) {
+    for (const auto &pattern: patterns_score) {
       if (my_lines[i].find(pattern.pattern)) {
         my_line_scores[i] += pattern.score;
       }
@@ -182,7 +186,7 @@ int TreeNode::ABSearch() {
     if (this->alpha >= this->beta) {
       break;
     } else {
-      this->children_nodes.insert(child_node);
+      this->children_nodes.push_back(child_node);
     }
   }
   return retVal;

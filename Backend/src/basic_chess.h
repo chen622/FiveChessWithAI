@@ -28,6 +28,7 @@
 #include <utility>
 #include <vector>
 
+#define BOARD_SIZE 15  // The size of the board
 #define POS_PAIR std::pair<int16_t,int16_t>
 
 namespace ccm {
@@ -87,7 +88,7 @@ class BasicChess {
   // Print the board in the console.
   void PrintBoard() const;
   // Set a piece into the board.
-  int NextStep(POS_PAIR position);
+  int NextStep(POS_PAIR position,bool silently);
   // Check the position has piece or not?
   bool HasPieceOnPosition(POS_PAIR position);
   bool IsForbidden(POS_PAIR position);

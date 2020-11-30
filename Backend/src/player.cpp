@@ -30,8 +30,8 @@ Player::Player(bool is_computer, bool is_first, uint16_t score)
 int Player::GetScore() const {
   return score;
 }
-void Player::SetScore(int _score) {
-  Player::score = _score;
+void Player::AddScore(int _score) {
+  Player::score += _score;
 }
 bool Player::IsComputer() const {
   return is_computer;

@@ -24,9 +24,8 @@
 #include <cstdint>
 #include <vector>
 #include "player.h"
+#include "tree_node.h"
 #include "basic_chess.h"
-
-#define BOARD_SIZE 15  // The size of the board
 
 namespace ccm {
 // A Class used to managing a chess game.
@@ -36,13 +35,14 @@ namespace ccm {
 class ChessGame {
  private:
   // The step_count of matches already finished
-  uint16_t count{};
+  uint16_t count;
   // The step_count of matches which need to finish
   uint16_t total_count;
   Player player1;
   Player player2;
   // A vector to save all chess boards
   std::vector<BasicChess> boards;
+//  TreeNode *tree_node;
   // Function to start a match.
   // Return positive if player1 win a match, 0 if no one win.
   int PlayAMatch();

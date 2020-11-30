@@ -30,48 +30,68 @@ ChessGame::ChessGame(bool has_computer, bool computer_first, uint16_t total_coun
       this->player2.SetIsComputer(true);
     }
   } else {  // PVP
-
   }
 }
 
 int ChessGame::Playing() {
-  while (WhoWinGame() == 0) {
+  int game_rst = 0;
+  while ((game_rst = WhoWinGame()) == 0) {
     int match_rst = this->PlayAMatch();
+    if (match_rst > 0){
+      this->player1.AddScore(1);
+    }else {
+      this->player2.AddScore(1);
+    }
     this->count++;
   }
-  return 0;
+  return game_rst;
 }
 
 int ChessGame::PlayAMatch() {
   int who_win = 0;
   BasicChess board(BOARD_SIZE);
+  TreeNode tree_node = TreeNode(this->count % 2 == 0 ? this->player1.IsComputer() : this->player2.IsComputer(), board);
   board.PrintBoard();
   while (who_win == 0) {  // check match has finish or not
-    std::pair<int16_t, int16_t> position;
+    POS_PAIR position;
     if ((board.GetStepCount()) % 2 == (this->count % 2)) {  // player 1 term
-      while (true) {
-        position = player1.NextStep(BOARD_SIZE);
-        if (board.HasPieceOnPosition(position)) {
-          std::cout << "落子位置已有棋子，请重新输入！" << std::endl;
-        } else if (this->count % 2 == 0 && board.IsForbidden(position)) {  // second term has forbidden position
-          std::cout << "落子位置为禁手，请重新输入！" << std::endl;
-        } else {
-          break;
+      if (player1.IsComputer()) {
+        position = tree_node.GetGoodMove();
+      } else {
+        while (true) {
+          position = player1.NextStep(BOARD_SIZE);
+          if (board.HasPieceOnPosition(position)) {
+            std::cout << "落子位置已有棋子，请重新输入！" << std::endl;
+          } else if (this->count % 2 == 0 && board.IsForbidden(position)) {  // second term has forbidden position
+            std::cout << "落子位置为禁手，请重新输入！" << std::endl;
+          } else {
+            break;
+          }
         }
-      }
-      who_win = board.NextStep(position);
+        if (player2.IsComputer()) {
+          tree_node = TreeNode(tree_node, position);
+        }
+      };
+      who_win = board.NextStep(position, false);
     } else {  // player 2 term
-      while (true) {
-        position = player2.NextStep(BOARD_SIZE);
-        if (board.HasPieceOnPosition(position)) {
-          std::cout << "落子位置已有棋子，请重新输入！" << std::endl;
-        } else if (this->count % 2 == 1 && board.IsForbidden(position)) {  // second term has forbidden position
-          std::cout << "落子位置为禁手，请重新输入！" << std::endl;
-        } else {
-          break;
+      if (player2.IsComputer()) {
+        position = tree_node.GetGoodMove();
+      } else {
+        while (true) {
+          position = player2.NextStep(BOARD_SIZE);
+          if (board.HasPieceOnPosition(position)) {
+            std::cout << "落子位置已有棋子，请重新输入！" << std::endl;
+          } else if (this->count % 2 == 1 && board.IsForbidden(position)) {  // second term has forbidden position
+            std::cout << "落子位置为禁手，请重新输入！" << std::endl;
+          } else {
+            break;
+          }
+        }
+        if (player2.IsComputer()) {
+          tree_node = TreeNode(tree_node, position);
         }
       }
-      who_win = -board.NextStep(position);
+      who_win = -board.NextStep(position,false);
     }
   }
   boards.push_back(board);

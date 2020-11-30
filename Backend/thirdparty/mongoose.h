@@ -4593,7 +4593,7 @@ struct mg_serve_http_opts {
    * current working directory. It can also be an URI (http:// or https://)
    * in which case mongoose will behave as a reverse proxy for that destination.
    *
-   * Note that `uri_pattern`, as all Mongoose patterns, is a prefix pattern.
+   * Note that `uri_pattern`, as all Mongoose patterns_score, is a prefix pattern.
    *
    * If uri_pattern starts with `@` symbol, then Mongoose compares it with the
    * HOST header of the request. If they are equal, Mongoose sets document root
