@@ -60,8 +60,6 @@ class BasicChess {
   std::vector<POS_PAIR> full_step;
   // Print the position symbol by type index.
   static void FormatPrint(BoardIndex type, int16_t row, int16_t column);
-  // Return positive if player1 win the match, 0 if no one has already win.
-  int HasWin();
   // A template function to traverse positions nearby the last step.
   // Para(0,1): vertical; Para(1,0): horizontal; Para(1,1): left bottom to right top
   int Traverse(POS_PAIR last_step, BoardIndex compare_val, int x_para, int y_para);
@@ -82,8 +80,10 @@ class BasicChess {
   BasicChess(const BasicChess &);
   int16_t GetWidth() const;
   BoardIndex **GetChessboard() const;
-
   uint32_t GetStepCount() const;
+
+  // Return positive if player1 win the match, 0 if no one has already win.
+  int HasWin();
   const std::vector<POS_PAIR> &GetFullStep() const;
   // Print the board in the console.
   void PrintBoard() const;

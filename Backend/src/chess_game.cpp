@@ -57,6 +57,7 @@ int ChessGame::PlayAMatch() {
     if ((board.GetStepCount()) % 2 == (this->count % 2)) {  // player 1 term
       if (player1.IsComputer()) {
         position = tree_node.GetGoodMove();
+        tree_node = TreeNode(tree_node, position);
       } else {
         while (true) {
           position = player1.NextStep(BOARD_SIZE);
@@ -76,6 +77,7 @@ int ChessGame::PlayAMatch() {
     } else {  // player 2 term
       if (player2.IsComputer()) {
         position = tree_node.GetGoodMove();
+        tree_node = TreeNode(tree_node, position);
       } else {
         while (true) {
           position = player2.NextStep(BOARD_SIZE);

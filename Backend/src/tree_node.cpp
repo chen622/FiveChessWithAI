@@ -31,8 +31,16 @@ TreeNode::TreeNode(bool is_black, const BasicChess &basic_chess)
   }
 }
 TreeNode::TreeNode(const TreeNode &last_node, POS_PAIR position)
-    : depth(0), type(true), is_black(!last_node.is_black), basic_chess(last_node.basic_chess) {
+    : depth(0), type(true), is_black(last_node.is_black), basic_chess(last_node.basic_chess) {
   this->basic_chess.NextStep(position, true);
+  this->total_score[0] = last_node.total_score[0];
+  this->total_score[1] = last_node.total_score[1];
+  for (int i = 0; i < 2; ++i) {
+    for (int j = 0; j < BOARD_SIZE * 6 - 2; ++j) {
+      this->line_score[i][j] = last_node.line_score[i][j];
+    }
+  }
+  this->possible_positions = last_node.possible_positions;
   this->UpdateScore(position);
   this->AddPossiblePosition(position);
 }
@@ -43,7 +51,15 @@ TreeNode::TreeNode(POS_PAIR position, TreeNode *father_node)
       basic_chess(father_node->basic_chess),
       alpha(father_node->alpha),
       beta(father_node->beta) {
+  this->possible_positions = father_node->possible_positions;
   this->basic_chess.NextStep(position, true);
+  this->total_score[0] = father_node->total_score[0];
+  this->total_score[1] = father_node->total_score[1];
+  for (int i = 0; i < 2; ++i) {
+    for (int j = 0; j < BOARD_SIZE * 6 - 2; ++j) {
+      this->line_score[i][j] = father_node->line_score[i][j];
+    }
+  }
   this->UpdateScore(position);
   this->AddPossiblePosition(position);
 }
@@ -57,8 +73,8 @@ int TreeNode::UpdateScore(POS_PAIR position) {
 
   // -
   for (int i = 0; i < BOARD_SIZE; i++) {
-    my_lines[0].push_back(GetCharOfPosition(board[position.second][i], my_index, rival_index));
-    rival_lines[0].push_back(GetCharOfPosition(board[position.second][i], rival_index, my_index));
+    my_lines[0].push_back(GetCharOfPosition(board[position.first][i], my_index, rival_index));
+    rival_lines[0].push_back(GetCharOfPosition(board[position.first][i], rival_index, my_index));
   }
 
   // |
@@ -71,8 +87,8 @@ int TreeNode::UpdateScore(POS_PAIR position) {
   for (int i = position.first - std::min(position.first, position.second),
            j = position.second - std::min(position.first, position.second); i < BOARD_SIZE && j < BOARD_SIZE;
        i++, j++) {
-    my_lines[2].push_back(GetCharOfPosition(board[i][position.second], my_index, rival_index));
-    rival_lines[2].push_back(GetCharOfPosition(board[i][position.second], rival_index, my_index));
+    my_lines[2].push_back(GetCharOfPosition(board[i][j], my_index, rival_index));
+    rival_lines[2].push_back(GetCharOfPosition(board[i][j], rival_index, my_index));
   }
 
   // /
@@ -80,8 +96,8 @@ int TreeNode::UpdateScore(POS_PAIR position) {
            j = position.second - std::min(BOARD_SIZE - position.first - 1, (int) position.second);
        i >= 0 && j < BOARD_SIZE;
        i--, j++) {
-    my_lines[3].push_back(GetCharOfPosition(board[i][position.second], my_index, rival_index));
-    rival_lines[3].push_back(GetCharOfPosition(board[i][position.second], rival_index, my_index));
+    my_lines[3].push_back(GetCharOfPosition(board[i][j], my_index, rival_index));
+    rival_lines[3].push_back(GetCharOfPosition(board[i][j], rival_index, my_index));
   }
 
   int my_line_scores[4]{0};
@@ -89,10 +105,10 @@ int TreeNode::UpdateScore(POS_PAIR position) {
 
   for (int i = 0; i < 4; ++i) {
     for (const auto &pattern: patterns_score) {
-      if (my_lines[i].find(pattern.pattern)) {
+      if (my_lines[i].find(pattern.pattern) != std::string::npos) {
         my_line_scores[i] += pattern.score;
       }
-      if (rival_lines[i].find(pattern.pattern)) {
+      if (rival_lines[i].find(pattern.pattern) != std::string::npos) {
         rival_line_scores[i] += pattern.score;
       }
     }
@@ -103,7 +119,7 @@ int TreeNode::UpdateScore(POS_PAIR position) {
   int16_t c = 2 * BOARD_SIZE + (position.second - position.first + BOARD_SIZE - 1);
   int16_t d = 2 * BOARD_SIZE + BOARD_SIZE * 2 - 1 + (position.first + position.second);
 
-  int old_score = total_score[0] - total_score[1];
+//  int old_score = total_score[0] - total_score[1];
   for (int i = 0; i < 2; ++i) {
     total_score[i] -= line_score[i][a] + line_score[i][b] + line_score[i][c] + line_score[i][d];
   }
@@ -119,7 +135,7 @@ int TreeNode::UpdateScore(POS_PAIR position) {
   for (int i = 0; i < 2; ++i) {
     total_score[i] += line_score[i][a] + line_score[i][b] + line_score[i][c] + line_score[i][d];
   }
-  return total_score[0] - total_score[1] - old_score;
+  return total_score[0] - total_score[1];
 }
 
 void TreeNode::AddPossiblePosition(POS_PAIR position) {
@@ -153,7 +169,9 @@ void TreeNode::AddPossiblePosition(POS_PAIR position) {
       }
       if (temp_position.first >= 0 && temp_position.first < this->basic_chess.GetWidth()
           && temp_position.second >= 0 && temp_position.second < this->basic_chess.GetWidth()
-          && !this->basic_chess.HasPieceOnPosition(temp_position)) {
+          && !this->basic_chess.HasPieceOnPosition(temp_position)
+          && std::find(this->possible_positions.begin(), this->possible_positions.end(), temp_position)
+              == this->possible_positions.end()) {
         this->possible_positions.push_back(temp_position);
       }
     }
@@ -171,7 +189,13 @@ int TreeNode::ABSearch() {
 
   for (const auto &position: this->possible_positions) {
     TreeNode child_node = TreeNode(position, this);
-    int child_score = child_node.ABSearch();
+    int child_score = 0;
+    if (child_node.basic_chess.HasWin()) { // If this node already win, don't count the score
+      child_score = (MAX_DEPTH - this->depth) * patterns_score[0].score; // deeper node has less score
+      if (!this->type) child_score = -child_score;
+    } else {
+      child_score = child_node.ABSearch();
+    }
     if (this->type) { // MAX
       if (child_score > this->alpha) {
         this->alpha = child_score;
@@ -191,14 +215,23 @@ int TreeNode::ABSearch() {
   }
   return retVal;
 }
+
 POS_PAIR TreeNode::GetGoodMove() {
   int max_score = this->ABSearch();
+  this->PrintTree();
   for (const auto &child: children_nodes) {
     if (child.beta == max_score) {
       return child.basic_chess.GetFullStep().back();
     }
   }
   return POS_PAIR(-1, -1);
+}
+
+void TreeNode::PrintTree() {
+  for (const auto &child: children_nodes) {
+    std::cout << child.beta << " ";
+  }
+  std::cout << std::endl;
 }
 
 char GetCharOfPosition(BoardIndex index, BoardIndex my, BoardIndex rival) {
