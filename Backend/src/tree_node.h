@@ -26,8 +26,8 @@
 #include <random>
 #include <set>
 #include "basic_chess.h"
-#define MAX_DEPTH 3
-#define INFINITY_SCORE 100000
+#define MAX_DEPTH 4
+#define INFINITY_SCORE 1000000
 
 namespace ccm {
 
@@ -37,7 +37,7 @@ struct Pattern {
 };
 
 static std::vector<Pattern> patterns_score = {
-    {"11111", INFINITY_SCORE},
+    {"11111", INFINITY_SCORE / 10},
     {"011110", 6000},
     {"011100", 720},
     {"001110", 720},
@@ -65,7 +65,7 @@ class TreeNode {
   bool is_black; // is first or not
   int line_score[2][BOARD_SIZE * 6 - 2]{0};
   int total_score[2]{0};
-  std::vector<POS_PAIR>possible_positions = {};
+  std::vector<POS_PAIR > possible_positions = {};
   BasicChess basic_chess;
   // This constructor is used to create a child node of a decision tree.
   TreeNode(POS_PAIR position, TreeNode *father_node);

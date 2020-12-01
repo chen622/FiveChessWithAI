@@ -89,7 +89,7 @@ int ChessGame::PlayAMatch() {
             break;
           }
         }
-        if (player2.IsComputer()) {
+        if (player1.IsComputer()) {
           tree_node = TreeNode(tree_node, position);
         }
       }

@@ -23,7 +23,7 @@
 
 int main() {
   cout << "欢迎体验Chenming的五子棋！" << endl;
-  cout << "请首先选择游戏模式：\n\t0：人人对战\t1：人机对战(人先)" << endl;
+  cout << "请首先选择游戏模式：\n\t0：人人对战\t1：人机对战(人先)\t2：人机对战(机先)" << endl;
   int type = 0;
   do {
     cin.clear();
@@ -34,6 +34,9 @@ int main() {
 
   if (type == 1) {
     ChessGame game(true, false, TOTAL_MATCH);
+    game.Playing();
+  }else if (type == 2){
+    ChessGame game(true, true, TOTAL_MATCH);
     game.Playing();
   } else {
     ChessGame game(type, false, TOTAL_MATCH);

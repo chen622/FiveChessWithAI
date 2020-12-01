@@ -140,7 +140,14 @@ int TreeNode::UpdateScore(POS_PAIR position) {
 
 void TreeNode::AddPossiblePosition(POS_PAIR position) {
   const auto &board = this->basic_chess.GetChessboard();
-  std::remove(this->possible_positions.begin(), this->possible_positions.end(), position);
+  auto itr = this->possible_positions.begin();
+  while (itr != this->possible_positions.end()) {
+    if (*itr == position) {
+      itr = this->possible_positions.erase(itr);
+    } else {
+      itr++;
+    }
+  }
   for (int i = 0; i < 8; ++i) {
     POS_PAIR temp_position = POS_PAIR(position);
     for (int j = 0; j < 2; ++j) {
@@ -179,8 +186,17 @@ void TreeNode::AddPossiblePosition(POS_PAIR position) {
 }
 
 int TreeNode::ABSearch() {
-  int retVal = this->type ? this->alpha : this->beta;
-  if (this->depth >= MAX_DEPTH) {
+  int retVal = this->type ? -INFINITY_SCORE : INFINITY_SCORE;
+  if (this->basic_chess.HasWin()) { // If this node already win, don't count the score
+    int ret = (MAX_DEPTH + 1 - this->depth) * patterns_score[0].score; // deeper node has less score
+    if (this->type) {
+      this->alpha = ret;
+      ret = -ret;
+    } else {
+      this->beta = ret;
+    }
+    return ret;
+  } else if (this->depth >= MAX_DEPTH) {
     return this->total_score[0] - this->total_score[1];
   }
   // Random sort the possible position
@@ -189,13 +205,7 @@ int TreeNode::ABSearch() {
 
   for (const auto &position: this->possible_positions) {
     TreeNode child_node = TreeNode(position, this);
-    int child_score = 0;
-    if (child_node.basic_chess.HasWin()) { // If this node already win, don't count the score
-      child_score = (MAX_DEPTH - this->depth) * patterns_score[0].score; // deeper node has less score
-      if (!this->type) child_score = -child_score;
-    } else {
-      child_score = child_node.ABSearch();
-    }
+    int child_score = child_node.ABSearch();
     if (this->type) { // MAX
       if (child_score > this->alpha) {
         this->alpha = child_score;
@@ -210,9 +220,12 @@ int TreeNode::ABSearch() {
     if (this->alpha >= this->beta) {
       break;
     } else {
-      this->children_nodes.push_back(child_node);
+      if (this->depth == 0) {
+        this->children_nodes.push_back(child_node);
+      }
     }
   }
+
   return retVal;
 }
 

@@ -108,23 +108,23 @@ void BasicChess::FormatPrint(BoardIndex type, int16_t row, int16_t column) {
                           "0" + std::to_string(row_number) : std::to_string(row_number));
   }
   switch (type) {
-    case BoardIndex::CENTER:std::cout << "╋━";
+    case BoardIndex::CENTER:std::cout << "╋";
       break;
-    case BoardIndex::LEFT_TOP:std::cout << "┏━";
+    case BoardIndex::LEFT_TOP:std::cout << "┏";
       break;
     case BoardIndex::RIGHT_TOP:std::cout << "┓";
       break;
     case BoardIndex::RIGHT_BOTTOM:std::cout << "┛";
       break;
-    case BoardIndex::LEFT_BOTTOM:std::cout << "┗━";
+    case BoardIndex::LEFT_BOTTOM:std::cout << "┗";
       break;
-    case BoardIndex::TOP:std::cout << "┳━";
+    case BoardIndex::TOP:std::cout << "┳";
       break;
     case BoardIndex::RIGHT:std::cout << "┫";
       break;
-    case BoardIndex::BOTTOM:std::cout << "┻━";
+    case BoardIndex::BOTTOM:std::cout << "┻";
       break;
-    case BoardIndex::LEFT:std::cout << "┣━";
+    case BoardIndex::LEFT:std::cout << "┣";
       break;
     case BoardIndex::BLACK_CHESS:std::cout << "●";
       break;
