@@ -37,9 +37,9 @@ int ChessGame::Playing() {
   int game_rst = 0;
   while ((game_rst = WhoWinGame()) == 0) {
     int match_rst = this->PlayAMatch();
-    if (match_rst > 0){
+    if (match_rst > 0) {
       this->player1.AddScore(1);
-    }else {
+    } else {
       this->player2.AddScore(1);
     }
     this->count++;
@@ -50,14 +50,16 @@ int ChessGame::Playing() {
 int ChessGame::PlayAMatch() {
   int who_win = 0;
   BasicChess board(BOARD_SIZE);
-  TreeNode tree_node = TreeNode(this->count % 2 == 0 ? this->player1.IsComputer() : this->player2.IsComputer(), board);
+  auto *tree_node = new TreeNode(this->count % 2 == 0 ? this->player1.IsComputer() : this->player2.IsComputer(), board);
   board.PrintBoard();
   while (who_win == 0) {  // check match has finish or not
     POS_PAIR position;
     if ((board.GetStepCount()) % 2 == (this->count % 2)) {  // player 1 term
       if (player1.IsComputer()) {
-        position = tree_node.GetGoodMove();
-        tree_node = TreeNode(tree_node, position);
+        position = tree_node->GetGoodMove();
+        auto *temp = tree_node;
+        tree_node = new TreeNode(tree_node, position);
+        delete temp;
       } else {
         while (true) {
           position = player1.NextStep(BOARD_SIZE);
@@ -70,14 +72,18 @@ int ChessGame::PlayAMatch() {
           }
         }
         if (player2.IsComputer()) {
-          tree_node = TreeNode(tree_node, position);
+          auto *temp = tree_node;
+          tree_node = new TreeNode(tree_node, position);
+          delete temp;
         }
       };
       who_win = board.NextStep(position, false);
     } else {  // player 2 term
       if (player2.IsComputer()) {
-        position = tree_node.GetGoodMove();
-        tree_node = TreeNode(tree_node, position);
+        position = tree_node->GetGoodMove();
+        auto *temp = tree_node;
+        tree_node = new TreeNode(tree_node, position);
+        delete temp;
       } else {
         while (true) {
           position = player2.NextStep(BOARD_SIZE);
@@ -90,14 +96,16 @@ int ChessGame::PlayAMatch() {
           }
         }
         if (player1.IsComputer()) {
-          tree_node = TreeNode(tree_node, position);
+          auto *temp = tree_node;
+          tree_node = new TreeNode(tree_node, position);
+          delete temp;
         }
       }
-      who_win = -board.NextStep(position,false);
+      who_win = -board.NextStep(position, false);
     }
   }
   boards.push_back(board);
-  std::cout << "一句比赛结束" << (who_win > 0 ? "玩家1获胜" : "玩家2获胜") << std::endl;
+  std::cout << "一局比赛结束" << (who_win > 0 ? "玩家1获胜" : "玩家2获胜") << std::endl;
   return who_win;
 }
 

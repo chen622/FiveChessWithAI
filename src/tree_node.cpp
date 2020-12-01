@@ -30,17 +30,17 @@ TreeNode::TreeNode(bool is_black, const BasicChess &basic_chess)
     this->possible_positions.emplace_back((BOARD_SIZE - 1) / 2, (BOARD_SIZE - 1) / 2);
   }
 }
-TreeNode::TreeNode(const TreeNode &last_node, POS_PAIR position)
-    : depth(0), type(true), is_black(last_node.is_black), basic_chess(last_node.basic_chess) {
+TreeNode::TreeNode(const TreeNode *last_node, POS_PAIR position)
+    : depth(0), type(true), is_black(last_node->is_black), basic_chess(last_node->basic_chess) {
   this->basic_chess.NextStep(position, true);
-  this->total_score[0] = last_node.total_score[0];
-  this->total_score[1] = last_node.total_score[1];
+  this->total_score[0] = last_node->total_score[0];
+  this->total_score[1] = last_node->total_score[1];
   for (int i = 0; i < 2; ++i) {
     for (int j = 0; j < BOARD_SIZE * 6 - 2; ++j) {
-      this->line_score[i][j] = last_node.line_score[i][j];
+      this->line_score[i][j] = last_node->line_score[i][j];
     }
   }
-  this->possible_positions = last_node.possible_positions;
+  this->possible_positions = last_node->possible_positions;
   this->UpdateScore(position);
   this->AddPossiblePosition(position);
 }
@@ -62,6 +62,11 @@ TreeNode::TreeNode(POS_PAIR position, TreeNode *father_node)
   }
   this->UpdateScore(position);
   this->AddPossiblePosition(position);
+}
+
+TreeNode::~TreeNode() {
+  this->possible_positions.clear();
+  this->children_nodes.clear();
 }
 
 int TreeNode::UpdateScore(POS_PAIR position) {
@@ -202,14 +207,15 @@ int TreeNode::ABSearch() {
   // Random sort the possible position
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::shuffle(this->possible_positions.begin(), this->possible_positions.end(), std::default_random_engine(seed));
-
   for (const auto &position: this->possible_positions) {
+    bool has_change = false;
     TreeNode child_node = TreeNode(position, this);
     int child_score = child_node.ABSearch();
     if (this->type) { // MAX
       if (child_score > this->alpha) {
         this->alpha = child_score;
         retVal = child_score;
+        has_change = true;
       }
     } else { //MIN
       if (child_score < this->beta) {
@@ -220,12 +226,12 @@ int TreeNode::ABSearch() {
     if (this->alpha >= this->beta) {
       break;
     } else {
-      if (this->depth == 0) {
+      if (this->depth == 0 && has_change) {
+        this->children_nodes.clear();
         this->children_nodes.push_back(child_node);
       }
     }
   }
-
   return retVal;
 }
 
@@ -239,7 +245,6 @@ POS_PAIR TreeNode::GetGoodMove() {
   }
   return POS_PAIR(-1, -1);
 }
-
 void TreeNode::PrintTree() {
   for (const auto &child: children_nodes) {
     std::cout << child.beta << " ";

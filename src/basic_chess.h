@@ -78,6 +78,7 @@ class BasicChess {
  public:
   explicit BasicChess(int16_t width);
   BasicChess(const BasicChess &);
+  virtual ~BasicChess();
   int16_t GetWidth() const;
   BoardIndex **GetChessboard() const;
   uint32_t GetStepCount() const;

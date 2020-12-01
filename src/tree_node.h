@@ -65,7 +65,7 @@ class TreeNode {
   bool is_black; // is first or not
   int line_score[2][BOARD_SIZE * 6 - 2]{0};
   int total_score[2]{0};
-  std::vector<POS_PAIR > possible_positions = {};
+  std::vector<POS_PAIR> possible_positions = {};
   BasicChess basic_chess;
   // This constructor is used to create a child node of a decision tree.
   TreeNode(POS_PAIR position, TreeNode *father_node);
@@ -74,8 +74,9 @@ class TreeNode {
   int ABSearch();
  public:
   TreeNode(bool is_black, const BasicChess &);
+  ~TreeNode();
   // This constructor is used to init a decision tree.
-  TreeNode(const TreeNode &last_node, POS_PAIR position);
+  TreeNode(const TreeNode *last_node, POS_PAIR position);
   POS_PAIR GetGoodMove();
   void PrintTree();
 };

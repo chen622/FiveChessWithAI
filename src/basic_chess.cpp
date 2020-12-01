@@ -68,6 +68,13 @@ BasicChess::BasicChess(const BasicChess &other_chess)
     }
   }
 }
+BasicChess::~BasicChess() {
+  for (int16_t i = 0; i < width; ++i) {
+    delete this->chessboard[i];
+  }
+  delete this->chessboard;
+  this->full_step.clear();
+}
 int16_t BasicChess::GetWidth() const {
   return width;
 }
@@ -107,24 +114,53 @@ void BasicChess::FormatPrint(BoardIndex type, int16_t row, int16_t column) {
     std::cout << "\t" << ((row_number < 10) ?
                           "0" + std::to_string(row_number) : std::to_string(row_number));
   }
+//  switch (type) {
+//    case BoardIndex::CENTER:std::cout << "╋";
+//      break;
+//    case BoardIndex::LEFT_TOP:std::cout << "┏";
+//      break;
+//    case BoardIndex::RIGHT_TOP:std::cout << "┓";
+//      break;
+//    case BoardIndex::RIGHT_BOTTOM:std::cout << "┛";
+//      break;
+//    case BoardIndex::LEFT_BOTTOM:std::cout << "┗";
+//      break;
+//    case BoardIndex::TOP:std::cout << "┳";
+//      break;
+//    case BoardIndex::RIGHT:std::cout << "┫";
+//      break;
+//    case BoardIndex::BOTTOM:std::cout << "┻";
+//      break;
+//    case BoardIndex::LEFT:std::cout << "┣";
+//      break;
+//    case BoardIndex::BLACK_CHESS:std::cout << "●";
+//      break;
+//    case BoardIndex::LAST_BLACK :std::cout << "▲";
+//      break;
+//    case BoardIndex::WHITE_CHESS:std::cout << "○";
+//      break;
+//    case BoardIndex::LAST_WHITE:std::cout << "△";
+//      break;
+//    default:std::cout << "0";
+//  }
   switch (type) {
-    case BoardIndex::CENTER:std::cout << "╋";
+    case BoardIndex::CENTER:std::cout << "╋━";
       break;
-    case BoardIndex::LEFT_TOP:std::cout << "┏";
+    case BoardIndex::LEFT_TOP:std::cout << "┏━";
       break;
     case BoardIndex::RIGHT_TOP:std::cout << "┓";
       break;
     case BoardIndex::RIGHT_BOTTOM:std::cout << "┛";
       break;
-    case BoardIndex::LEFT_BOTTOM:std::cout << "┗";
+    case BoardIndex::LEFT_BOTTOM:std::cout << "┗━";
       break;
-    case BoardIndex::TOP:std::cout << "┳";
+    case BoardIndex::TOP:std::cout << "┳━";
       break;
     case BoardIndex::RIGHT:std::cout << "┫";
       break;
-    case BoardIndex::BOTTOM:std::cout << "┻";
+    case BoardIndex::BOTTOM:std::cout << "┻━";
       break;
-    case BoardIndex::LEFT:std::cout << "┣";
+    case BoardIndex::LEFT:std::cout << "┣━";
       break;
     case BoardIndex::BLACK_CHESS:std::cout << "●";
       break;
@@ -138,13 +174,13 @@ void BasicChess::FormatPrint(BoardIndex type, int16_t row, int16_t column) {
   }
 }
 
-int BasicChess::NextStep(POS_PAIR position,bool silently) {
+int BasicChess::NextStep(POS_PAIR position, bool silently) {
 //  position.first = width - position.first - 1;
   chessboard[position.first][position.second] =
       this->step_count % 2 == 0 ? BoardIndex::BLACK_CHESS : BoardIndex::WHITE_CHESS;
   this->step_count++;
   this->full_step.push_back(position);
-  if (!silently){
+  if (!silently) {
     system("clear");
 //  system("CLS");
     this->PrintBoard();
@@ -183,7 +219,7 @@ int BasicChess::HasWin() {
 
 int BasicChess::Traverse(POS_PAIR last_step, BoardIndex compare_val, int x_para, int y_para) {
   int count = 1;
-  for (int16_t i = 1;true; i++) {
+  for (int16_t i = 1; true; i++) {
     int16_t x = last_step.first + (i * x_para), y = last_step.second + (i * y_para);
     if (x >= width || y >= width || x < 0 || y < 0) break;
     if (chessboard[x][y] != compare_val) break;
@@ -299,4 +335,5 @@ bool BasicChess::FillInThreeAndCheckFour(POS_PAIR position, int x_para, int y_pa
   }
   return false;
 }
+
 }  // namespace ccm
