@@ -44,6 +44,8 @@ int ChessGame::Playing() {
     }
     this->count++;
   }
+  if (game_rst > 0) std::cout << "Player 1 win the game!" << std::endl;
+  else std::cout << "Player 2 win the game!" << std::endl;
   return game_rst;
 }
 

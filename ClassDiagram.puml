@@ -1,0 +1,45 @@
+@startuml
+namespace ccm {
+
+
+class ChessGame
+class Player
+class BasicChess
+class TreeNode
+note top of ChessGame : #define POS_PAIR std::pair<int16_t,int16_t>
+
+ChessGame "1" *-left- "2" Player
+ChessGame "1" *-- "0..5" BasicChess
+ChessGame ..right> TreeNode
+TreeNode ..> BasicChess
+
+class ChessGame{
+- int PlayAMatch()
+- int WhoWinGame()
++ int Playing()
+}
+
+class Player{
++ POS_PAIR NextStep(int)
+}
+
+class BasicChess{
++ int HasWin()
++ void PrintBoard()
++ int NextStep(POS_PAIR, bool)
++ bool IsForbidden(POS_PAIR)
++ bool HasPieceOnPosition(POS_PAIR)
+}
+
+Class TreeNode{
+- int[][]: line_score
+- int[]: total_score
+- std::vector<POS_PAIR> possible_positions
+
+- int UpdateScore(POS_PAIR position)
+- void AddPossiblePosition(POS_PAIR)
+- int ABSearch()
++ POS_PAIR GetGoodMove()
+}
+}
+@enduml

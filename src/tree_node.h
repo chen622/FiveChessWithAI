@@ -26,7 +26,7 @@
 #include <random>
 #include <set>
 #include "basic_chess.h"
-#define MAX_DEPTH 4
+#define MAX_DEPTH 3
 #define INFINITY_SCORE 1000000
 
 namespace ccm {
