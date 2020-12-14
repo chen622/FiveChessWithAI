@@ -22,7 +22,7 @@ cmake ..
 make
 chmod +x ./bin/fivechess
 ./bin/fivechess
-# The UI works well with font SONG(宋).
+# The UI works well with font SONG(宋) and Shell bash.
 ```
 
 If you want to change the parameters, this is a table to record all the parameters.
@@ -33,8 +33,3 @@ If you want to change the parameters, this is a table to record all the paramete
 | BOARD_SIZE  | 15            | The size of the chess board                                  |
 | MAX_DEPTH   | 3             | The depth of decision tree. The program works much better when the depth is 4, but it will take more time. |
 
-
-
-## TODO
-
-Maybe I will change this project to a web server to play five chess online.

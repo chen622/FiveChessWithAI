@@ -54,9 +54,9 @@ std::pair<int16_t, int16_t> Player::NextStep(int width) const {
   int16_t row, col;
   unsigned char col_str;
   do {
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
     std::cin.clear();
-    std::cout << "轮到 Player" << (is_first ? "1" : "2") << " 落子：";
+    std::cin.ignore();
+    std::cout << "轮到 Player" << (is_first ? "1" : "2") << " 落子（如 9H）：";
     std::cin >> row >> col_str;
     if (std::cin.fail() || isalpha(col_str) == 0) std::cout << "输入值异常，请重新输入！" << std::endl;
     else {
